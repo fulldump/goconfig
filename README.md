@@ -55,6 +55,30 @@ c := &myconfig{
 goconfig.Read(c)
 ```
 
+How the `-help` looks like:
+
+```
+Usage of example:
+  -enablelog
+    	Enable logging into logdb (default true)
+  -logdb.host string
+    	Host where db is located (default "localhost")
+  -logdb.pass string
+    	Database password (default "123456")
+  -logdb.user string
+    	Database user (default "root")
+  -maxprocs int
+    	Maximum number of procs
+  -name string
+    	The name of something
+  -usersdb.host string
+    	Host where db is located
+  -usersdb.pass string
+    	Database password
+  -usersdb.user string
+    	Database user
+```
+
 
 # Supported types
 
