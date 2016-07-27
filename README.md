@@ -10,6 +10,8 @@ Arguments are parsed from command line with the standard `flag` library.
 - [How to use](#how-to-use)
 - [Supported types](#supported-types)
 - [Builtin configuration keys](#builtin-configuration-keys)
+  - [-help](#-help)
+  - [-config](#-config)
 - [Contribute](#contribute)
 - [Testing](#testing)
 - [Example project](#example-project)
@@ -100,8 +102,31 @@ Type `slice` or `array` is also being considered.
 
 # Builtin configuration keys
 
+## -help
+
 Since `flag` library is using the key `-help` to show usage, Goconf is behaving
 in the same way.
+
+## -config
+
+Builtin flag `-config` allow read configuration from a file. For the example
+configuration above, this is a sample config.json file:
+
+```json
+{
+  "name": "Fulanito",
+  "usersdb": {
+    "host": "localhost",
+    "user": "admin",
+    "pass": "123"
+  }
+}
+```
+
+Configuration precedence is as follows (higher to lower):
+* Arg command line
+* Json config file
+* Default value
 
 
 # Contribute
