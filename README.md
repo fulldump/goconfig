@@ -9,7 +9,7 @@ Arguments are parsed from command line with the standard `flag` library.
 
 - [How to use](#how-to-use)
 - [Supported types](#supported-types)
-- [Builtin configuration keys](#builtin-configuration-keys)
+- [Builtin flags](#builtin-flags)
   - [-help](#-help)
   - [-config](#-config)
 - [Contribute](#contribute)
@@ -100,7 +100,7 @@ For the moment `duration` type is not supported.
 Type `slice` or `array` is also being considered.
 
 
-# Builtin configuration keys
+# Builtin flags
 
 ## -help
 
