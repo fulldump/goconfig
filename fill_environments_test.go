@@ -18,6 +18,10 @@ func TestFillEnvironments(t *testing.T) {
 		MyUint64    uint64
 		MyUint32    uint32
 		MyUint      uint
+		MyEmpty     string
+		MyStruct    struct {
+			MyItem string
+		}
 	}{}
 
 	os.Setenv("MYBOOLTRUE", "true")
@@ -31,6 +35,8 @@ func TestFillEnvironments(t *testing.T) {
 	os.Setenv("MYUINT64", "64")
 	os.Setenv("MYUINT32", "32")
 	os.Setenv("MYUINT", "4444")
+	os.Setenv("MYSTRUCT_MYITEM", "nested")
+	os.Setenv("MYEMPTY", "")
 
 	FillEnvironments(&c)
 
@@ -76,6 +82,14 @@ func TestFillEnvironments(t *testing.T) {
 
 	if c.MyUint != 4444 {
 		t.Error("MyUint should be 4444")
+	}
+
+	if c.MyEmpty != "" {
+		t.Error("MyEmpty should be ''")
+	}
+
+	if c.MyStruct.MyItem != "nested" {
+		t.Error("MyStruct.MyItem should be 'nested'")
 	}
 
 }

@@ -12,6 +12,9 @@ func TestFillArgs(t *testing.T) {
 		MyInt       int
 		MyUint64    uint64
 		MyUint      uint
+		MyStruct    struct {
+			MyItem string
+		}
 	}{}
 
 	args := []string{
@@ -23,6 +26,7 @@ func TestFillArgs(t *testing.T) {
 		"-myint", "8888",
 		"-myuint64", "64",
 		"-myuint", "4444",
+		"-mystruct.myitem", "nested",
 	}
 
 	FillArgs(&c, args)
@@ -57,6 +61,10 @@ func TestFillArgs(t *testing.T) {
 
 	if c.MyUint != 4444 {
 		t.Error("MyUint should be 4444")
+	}
+
+	if c.MyStruct.MyItem != "nested" {
+		t.Error("MyStruct.MyItem should be 'nested'")
 	}
 
 }
