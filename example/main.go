@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 
+	"os"
+
 	"github.com/fulldump/goconfig"
 )
 
@@ -23,6 +25,8 @@ type db struct {
 }
 
 func main() {
+
+	fmt.Printf("%#v\n", os.Args)
 
 	// Default configuration
 	c := &myconfig{
