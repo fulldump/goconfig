@@ -33,7 +33,7 @@ func traverse_recursive(c interface{}, f callback, p []string) {
 		field := t.Type().Field(i)
 		name := field.Name
 		value := t.Field(i)
-		usage := string(field.Tag)
+		usage := field.Tag.Get("usage")
 		ptr := value.Addr().Interface()
 		kind := value.Kind()
 

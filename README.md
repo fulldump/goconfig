@@ -25,17 +25,17 @@ Define your structure with **descriptions**:
 
 ```go
 type myconfig struct {
-	Name      string `The name of something`
-	EnableLog bool   `Enable logging into logdb`
-	MaxProcs  int    `Maximum number of procs`
+	Name      string `usage:"The name of something"`
+	EnableLog bool   `usage:"Enable logging into logdb" json:"enable_log"`
+	MaxProcs  int    `usage:"Maximum number of procs"`
 	UsersDB   db
 	LogDB     db
 }
 
 type db struct {
-	Host string `Host where db is located`
-	User string `Database user`
-	Pass string `Database password`
+	Host string `usage:"Host where db is located"`
+	User string `usage:"Database user"`
+	Pass string `usage:"Database password"`
 }
 ```
 
