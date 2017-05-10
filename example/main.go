@@ -10,18 +10,18 @@ import (
 
 // My custom configuration options
 type myconfig struct {
-	Name      string `The name of something`
-	EnableLog bool   `Enable logging into logdb`
-	MaxProcs  int    `Maximum number of procs`
+	Name      string `usage:"The name of something"`
+	EnableLog bool   `usage:"Enable logging into logdb"`
+	MaxProcs  int    `usage:"Maximum number of procs"`
 	UsersDB   db
 	LogDB     db
 }
 
 // Reusable configuration structure
 type db struct {
-	Host string `Host where db is located`
-	User string `Database user`
-	Pass string `Database password`
+	Host string `usage:"Host where db is located"`
+	User string `usage:"Database user"`
+	Pass string `usage:"Database password"`
 }
 
 func main() {
