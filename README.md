@@ -1,5 +1,11 @@
 <img src="logo.png">
 
+<p align="center">
+<a href="https://travis-ci.org/fulldump/goconfig"><img src="https://travis-ci.org/fulldump/goconfig.svg?branch=master"></a>
+<a href="https://goreportcard.com/report/fulldump/goconfig"><img src="http://goreportcard.com/badge/fulldump/goconfig"></a>
+<a href="https://godoc.org/github.com/fulldump/goconfig"><img src="https://godoc.org/github.com/fulldump/goconfig?status.svg" alt="GoDoc"></a>
+</p>
+
 Goconfig is an extremely simple configuration library for your Go programs.
 Make your configuration flags compact and easy to read.
 
