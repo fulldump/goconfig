@@ -3,6 +3,9 @@ package goconfig
 import "testing"
 
 func TestFillArgs(t *testing.T) {
+
+	filled_string := "filled pointer"
+
 	c := struct {
 		MyBoolTrue  bool
 		MyBoolFalse bool
@@ -15,7 +18,10 @@ func TestFillArgs(t *testing.T) {
 		MyStruct    struct {
 			MyItem string
 		}
-	}{}
+		MyPointer *string
+	}{
+		MyPointer: &filled_string,
+	}
 
 	args := []string{
 		"-mybooltrue",
@@ -27,6 +33,7 @@ func TestFillArgs(t *testing.T) {
 		"-myuint64", "64",
 		"-myuint", "4444",
 		"-mystruct.myitem", "nested",
+		"-mypointer", "filled pointer",
 	}
 
 	FillArgs(&c, args)

@@ -4,3 +4,5 @@ pkg/
 src/
 coverage*
 config.json
+
+/TestFillJson.testcase.json

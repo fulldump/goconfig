@@ -6,6 +6,9 @@ import (
 )
 
 func TestFillEnvironments(t *testing.T) {
+
+	filled_string := "filled pointer"
+
 	c := struct {
 		MyBoolTrue  bool
 		MyBoolFalse bool
@@ -19,10 +22,13 @@ func TestFillEnvironments(t *testing.T) {
 		MyUint32    uint32
 		MyUint      uint
 		MyEmpty     string
+		MyPointer   *string
 		MyStruct    struct {
 			MyItem string
 		}
-	}{}
+	}{
+		MyPointer: &filled_string,
+	}
 
 	os.Setenv("MYBOOLTRUE", "true")
 	os.Setenv("MYBOOLFALSE", "false")
@@ -37,6 +43,7 @@ func TestFillEnvironments(t *testing.T) {
 	os.Setenv("MYUINT", "4444")
 	os.Setenv("MYSTRUCT_MYITEM", "nested")
 	os.Setenv("MYEMPTY", "")
+	os.Setenv("MYPOINTER", "replaced pointer")
 
 	FillEnvironments(&c)
 
@@ -90,6 +97,10 @@ func TestFillEnvironments(t *testing.T) {
 
 	if c.MyStruct.MyItem != "nested" {
 		t.Error("MyStruct.MyItem should be 'nested'")
+	}
+
+	if *c.MyPointer != "filled pointer" {
+		t.Error("MyPointer do not match")
 	}
 
 }

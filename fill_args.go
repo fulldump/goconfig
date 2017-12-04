@@ -19,6 +19,12 @@ func FillArgs(c interface{}, args []string) {
 	traverse(c, func(i item) {
 		name_path := strings.ToLower(strings.Join(i.Path, "."))
 
+		for reflect.Ptr == i.Kind {
+			i.Value = i.Value.Elem()
+			i.Ptr = i.Value.Addr().Interface()
+			i.Kind = i.Value.Kind()
+		}
+
 		if reflect.Bool == i.Kind {
 			f.BoolVar(i.Ptr.(*bool), name_path, i.Value.Interface().(bool), i.Usage)
 
