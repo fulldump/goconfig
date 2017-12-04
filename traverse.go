@@ -2,6 +2,7 @@ package goconfig
 
 import (
 	"reflect"
+	"strconv"
 	"strings"
 )
 
@@ -42,9 +43,8 @@ func traverse_recursive(c interface{}, f callback, p []string) {
 
 		if reflect.Struct == kind {
 			traverse_recursive(ptr, f, p)
-
 		} else if reflect.Slice == kind {
-			panic("Slice is not supported by goconfig at this moment.")
+			traverse_recursive_slice(ptr, f, p)
 		} else {
 			f(item{
 				FieldName: name,
@@ -54,7 +54,6 @@ func traverse_recursive(c interface{}, f callback, p []string) {
 				Path:      p,
 				Value:     value,
 			})
-
 		}
 
 		values[name_path] = ptr
@@ -62,5 +61,34 @@ func traverse_recursive(c interface{}, f callback, p []string) {
 		p = p[0 : len(p)-1]
 
 	}
+
+}
+
+func traverse_recursive_slice(c interface{}, f callback, p []string) {
+
+	value := reflect.ValueOf(c)
+
+	// Follow pointers
+	for reflect.Ptr == value.Kind() {
+		value = value.Elem()
+	}
+
+	for v := 0; v < value.Len(); v++ {
+		name := strconv.Itoa(v)
+		value := value.Index(v)
+		ptr := value.Addr().Interface()
+		path := append(p, name)
+		f(item{
+			FieldName: name,
+			Usage:     "",
+			Ptr:       ptr,
+			Kind:      value.Kind(),
+			Path:      path,
+			Value:     value,
+		})
+		name_path := strings.Join(path, ".")
+		values[name_path] = ptr
+	}
+	//panic("Slice is not supported by goconfig at this moment.")
 
 }
