@@ -5,13 +5,15 @@ import (
 	"os"
 	"reflect"
 	"strings"
+	"fmt"
 )
 
 var values = map[string]interface{}{}
 
 func FillArgs(c interface{}, args []string) {
-
-	var f = flag.NewFlagSet(os.Args[0], flag.ExitOnError)
+	var f = flag.NewFlagSet(os.Args[0], flag.ContinueOnError)
+	f.Usage = func() {}
+	f.SetOutput(os.Stdout)
 
 	// Default config flag
 	f.String("config", "", "Configuration JSON file")
@@ -50,6 +52,10 @@ func FillArgs(c interface{}, args []string) {
 
 	})
 
-	f.Parse(args)
-
+	if err := f.Parse(args); err != nil && err == flag.ErrHelp {
+		f.SetOutput(os.Stderr)
+		fmt.Fprint(f.Output(), "Usage of goconfig:\n\n")
+		f.PrintDefaults()
+		os.Exit(1)
+	}
 }
