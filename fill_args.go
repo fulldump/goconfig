@@ -54,7 +54,7 @@ func FillArgs(c interface{}, args []string) {
 
 	if err := f.Parse(args); err != nil && err == flag.ErrHelp {
 		f.SetOutput(os.Stderr)
-		fmt.Fprint(f.Output(), "Usage of goconfig:\n\n")
+		fmt.Fprint(os.Stderr, "Usage of goconfig:\n\n")
 		f.PrintDefaults()
 		os.Exit(1)
 	}
