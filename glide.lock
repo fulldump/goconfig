@@ -1,8 +1,10 @@
-hash: 3c697992da28692eec8fa37af70c7118b48b050f3c08516a4b4ae897547d521a
-updated: 2018-04-07T07:32:15.438218+02:00
+hash: b08ef0771fd96758a341c659dfa0d97ea7c5580faa5672342f1798bb131a9a6a
+updated: 2018-04-07T08:32:28.664388+02:00
 imports:
 - name: github.com/fulldump/goconfig
   version: a38cc884ea08c7b1a966103fff0357aeeab4c2e4
 - name: github.com/go-yaml/yaml
   version: bec87e4332aede01fb63a4ab299d8af28480cd96
+- name: gopkg.in/yaml.v2
+  version: 7f97868eec74b32b0982dd158a51a446d1da7eb5
 testImports: []

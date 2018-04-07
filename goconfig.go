@@ -14,7 +14,12 @@ func Read(c interface{}) {
 	f.Parse(os.Args[1:])
 
 	// Read from file JSON
-		FillJson(c, *filename)
+	//FillJson(c, *filename)
+	p,err:=getProvider(*filename)
+	if err!=nil {
+
+	}
+	p.fill(c)
 
 	// Overwrite configuration with environment vars:
 	FillEnvironments(c)
