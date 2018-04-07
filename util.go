@@ -3,6 +3,8 @@ package goconfig
 import (
 	"reflect"
 	"os"
+	"encoding/json"
+	"fmt"
 )
 
 func set(dest, value interface{}) {
@@ -19,4 +21,34 @@ func isFile(pth string) bool {
 }
 
 
+//fillStruct conversion function
+func fillStruct(m map[string]interface{}, s interface{}) {
+	j, err := json.Marshal(m)
+	if err!=nil{
+		fmt.Println(err)
+	}
+	json.Unmarshal(j, s)
+}
 
+func normalizeMap(in map[string]interface{}) map[string]interface{} {
+	res := make(map[string]interface{})
+	for i, variable := range in {
+		switch val := variable.(type) {
+		case map[interface{}]interface{}:
+			res[i] = normalizeMap(normalizeGenericMap(val))
+		case *map[string]interface{}:
+			res[i] = normalizeMap(*val)
+		default:
+			res[i] = val
+		}
+	}
+	return res
+}
+
+func normalizeGenericMap(in map[interface{}]interface{}) map[string]interface{} {
+	res := make(map[string]interface{})
+	for k, valChild := range in {
+		res[k.(string)] = valChild
+	}
+	return res
+}

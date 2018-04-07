@@ -1,6 +1,0 @@
-bin/
-pkg/
-.idea/
-src/
-coverage*
-config.json

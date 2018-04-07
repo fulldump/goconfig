@@ -2,10 +2,8 @@ package main
 
 import (
 	"fmt"
-
 	"os"
-
-	"github.com/wesovilabs/goconfig"
+	"github.com/fulldump/goconfig"
 )
 
 // My custom configuration options

@@ -1,5 +1,5 @@
-EnableLog: true
-LogDB:
-  Host: goconfig.server.address
-  User: wesovilabs-yml
-  Pass: s3cr3t0-yml
+enableLog: false
+logDB:
+  host: goconfig.server.address
+  user: wesovilabs-yml
+  pass: s3cr3t0-yml

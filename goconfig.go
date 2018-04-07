@@ -8,19 +8,19 @@ import (
 )
 
 func Read(c interface{}) {
-
 	f := flag.NewFlagSet(os.Args[0], flag.ContinueOnError)
 	f.SetOutput(ioutil.Discard)
 	filename := f.String("config", "", "-usage-")
 	f.Parse(os.Args[1:])
 
-
-	p, err := getProvider(*filename)
-	if err != nil {
-		fmt.Printf("It fails silentlty %s ",err.Error())
-		p.fill(c)
+	if len(*filename) > 0 {
+		p, err := getProvider(*filename)
+		if err != nil {
+			fmt.Printf("It fails silentlty %s ", err.Error())
+		} else {
+			p.fill(c)
+		}
 	}
-
 	// Overwrite configuration with environment vars:
 	FillEnvironments(c)
 

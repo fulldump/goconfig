@@ -9,6 +9,7 @@ import (
 	"os"
 	"encoding/json"
 	"gopkg.in/yaml.v2"
+	"github.com/fatih/structs"
 )
 
 type providerType int
@@ -51,6 +52,7 @@ func (pJson *jsonProvider) which() providerType {
 
 func (pJson *jsonProvider) fill(c interface{}) {
 	err := json.Unmarshal(pJson.data, &c)
+	fmt.Println(c)
 	if nil != err {
 		fmt.Println("Config file should be a valid JSON")
 		os.Exit(1)
@@ -61,11 +63,16 @@ func (json *ymlProvider) which() providerType {
 	return typeYaml
 }
 func (pYml *ymlProvider) fill(c interface{}) {
-	err := yaml.Unmarshal(pYml.data, &c)
+	content := structs.Map(c)
+	err := yaml.UnmarshalStrict(pYml.data, content)
 	if nil != err {
 		fmt.Println("Config file should be a valid YAML")
 		os.Exit(1)
 	}
+	content=normalizeMap(content)
+	fillStruct(content, c)
+	fmt.Println(c)
+
 }
 
 func getProvider(configPath string) (provider, error) {
@@ -90,6 +97,9 @@ func getProvider(configPath string) (provider, error) {
 
 func getProviderType(path string) (providerType, error) {
 	ext := strings.ToLower(filepath.Ext(path))
+	if len(ext) > 0 {
+		ext = ext[1:]
+	}
 	if isJson(ext) {
 		return typeJson, nil
 	} else if isYml(ext) {
