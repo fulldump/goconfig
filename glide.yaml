@@ -1,6 +1,0 @@
-package: goconfig
-import:
-- package: gopkg.in/yaml.v2
-  version: master
-- package: github.com/fatih/structs
-  version: master

@@ -1,0 +1,8 @@
+{
+  "enableLog": false,
+  "logDB":{
+    "host": "goconfig.server.address",
+    "user": "wesovilabs-json",
+    "pass": "s3cr3t0-json"
+  }
+}

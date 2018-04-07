@@ -3,4 +3,3 @@ pkg/
 .idea/
 src/
 coverage*
-config.json
