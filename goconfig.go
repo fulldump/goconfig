@@ -4,6 +4,7 @@ import (
 	"flag"
 	"io/ioutil"
 	"os"
+	"fmt"
 )
 
 func Read(c interface{}) {
@@ -13,13 +14,12 @@ func Read(c interface{}) {
 	filename := f.String("config", "", "-usage-")
 	f.Parse(os.Args[1:])
 
-	// Read from file JSON
-	//FillJson(c, *filename)
-	p,err:=getProvider(*filename)
-	if err!=nil {
 
+	p, err := getProvider(*filename)
+	if err != nil {
+		fmt.Printf("It fails silentlty %s ",err.Error())
+		p.fill(c)
 	}
-	p.fill(c)
 
 	// Overwrite configuration with environment vars:
 	FillEnvironments(c)

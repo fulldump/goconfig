@@ -5,7 +5,7 @@ import (
 
 	"os"
 
-	"github.com/fulldump/goconfig"
+	"github.com/wesovilabs/goconfig"
 )
 
 // My custom configuration options
