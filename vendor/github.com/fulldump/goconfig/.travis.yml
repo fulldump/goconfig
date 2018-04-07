@@ -9,4 +9,4 @@ go:
   - "1.10"
 
 script:
- - make setup && make test cover=1
+ - make setup && make test

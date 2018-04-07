@@ -1,0 +1,4 @@
+package: goconfig
+import:
+- package: github.com/go-yaml/yaml
+  version: master
