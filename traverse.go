@@ -37,11 +37,14 @@ func traverse_recursive(c interface{}, f callback, p []string) {
 		ptr := value.Addr().Interface()
 		kind := value.Kind()
 
-		p = append(p, strings.ToLower(name))
+		pr := p // parents to pass recursively
+		if !field.Anonymous {
+			pr = append(p, strings.ToLower(name))
+		}
 		name_path := strings.Join(p, ".")
 
 		if reflect.Struct == kind {
-			traverse_recursive(ptr, f, p)
+			traverse_recursive(ptr, f, pr)
 
 		} else if reflect.Slice == kind {
 			panic("Slice is not supported by goconfig at this moment.")
@@ -51,7 +54,7 @@ func traverse_recursive(c interface{}, f callback, p []string) {
 				Usage:     usage,
 				Ptr:       ptr,
 				Kind:      kind,
-				Path:      p,
+				Path:      pr,
 				Value:     value,
 			})
 
@@ -59,7 +62,7 @@ func traverse_recursive(c interface{}, f callback, p []string) {
 
 		values[name_path] = ptr
 
-		p = p[0 : len(p)-1]
+		//p = p[0 : len(p)-1]
 
 	}
 
