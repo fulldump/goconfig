@@ -1,7 +1,9 @@
 package goconfig
 
 import (
+	"fmt"
 	"os"
+	"reflect"
 	"testing"
 )
 
@@ -92,4 +94,21 @@ func TestFillEnvironments(t *testing.T) {
 		t.Error("MyStruct.MyItem should be 'nested'")
 	}
 
+}
+
+func TestFillEnvironmentsWithArrayStrings(t *testing.T) {
+
+	c := struct {
+		MyStringArray []string
+	}{}
+
+	os.Setenv("MYSTRINGARRAY", `["one", "two", "three"]`)
+
+	FillEnvironments(&c)
+
+	fmt.Println(c)
+
+	if !reflect.DeepEqual(c.MyStringArray, []string{"one", "two", "three"}) {
+		t.Error("MyStringArrayshould be [one, two, three]")
+	}
 }

@@ -1,11 +1,12 @@
 package goconfig
 
 import (
+	"encoding/json"
 	"flag"
+	"fmt"
 	"os"
 	"reflect"
 	"strings"
-	"fmt"
 )
 
 var values = map[string]interface{}{}
@@ -43,6 +44,12 @@ func FillArgs(c interface{}, args []string) {
 			f.UintVar(i.Ptr.(*uint), name_path, i.Value.Interface().(uint), i.Usage)
 
 		} else if reflect.Slice == i.Kind {
+
+			f.StringVar(i.Ptr.(*string), name_path, i.Value.Interface().(string), i.Usage)
+
+			err := json.Unmarshal([]byte(value), i.Ptr)
+			fmt.Println("Is slice", err)
+
 			panic("Slice is not supported by goconfig at this moment.")
 
 		} else {

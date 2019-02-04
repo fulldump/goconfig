@@ -1,6 +1,9 @@
 package goconfig
 
-import "testing"
+import (
+	"reflect"
+	"testing"
+)
 
 func TestFillArgs(t *testing.T) {
 	c := struct {
@@ -67,4 +70,21 @@ func TestFillArgs(t *testing.T) {
 		t.Error("MyStruct.MyItem should be 'nested'")
 	}
 
+}
+
+func TestFillArgsWithArrayString(t *testing.T) {
+
+	c := struct {
+		MyStringArray []string
+	}{}
+
+	args := []string{
+		`-MyStringArray=["one","two","three"]`,
+	}
+
+	FillArgs(&c, args)
+
+	if !reflect.DeepEqual(c.MyStringArray, []string{"one", "two", "three"}) {
+		t.Error(`MyStringArray should be ["one","two","three"]`)
+	}
 }

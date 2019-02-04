@@ -1,6 +1,8 @@
 package goconfig
 
 import (
+	"encoding/json"
+	"fmt"
 	"os"
 	"reflect"
 	"strconv"
@@ -69,6 +71,9 @@ func FillEnvironments(c interface{}) {
 				set(i.Ptr, &w)
 			}
 
+		} else if reflect.Slice == i.Kind {
+			err := json.Unmarshal([]byte(value), i.Ptr)
+			fmt.Println("Is slice", err)
 		}
 
 	})
