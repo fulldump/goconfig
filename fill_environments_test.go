@@ -93,3 +93,23 @@ func TestFillEnvironments(t *testing.T) {
 	}
 
 }
+
+func TestFillEnvironmentsWithPointers(t *testing.T) {
+
+	fulanito := "Fulanito"
+
+	c := struct {
+		MyName *string
+	}{
+		MyName: &fulanito,
+	}
+
+	os.Setenv("MYNAME", "Menganito")
+
+	FillEnvironments(&c)
+
+	if *c.MyName != "Menganito" {
+		t.Error("MyStruct.(*MyItem) should be 'Menganito'")
+	}
+
+}

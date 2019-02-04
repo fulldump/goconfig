@@ -16,6 +16,12 @@ func FillEnvironments(c interface{}) {
 			return
 		}
 
+		// TODO: check null pointer and create structs
+		if reflect.Ptr == i.Kind {
+			i.Kind = i.Value.Elem().Kind()
+			i.Ptr = i.Value.Elem().Addr().Interface()
+		}
+
 		if reflect.Bool == i.Kind {
 			if v, err := strconv.ParseBool(value); nil == err {
 				set(i.Ptr, &v)
@@ -68,8 +74,8 @@ func FillEnvironments(c interface{}) {
 				w := uint(v)
 				set(i.Ptr, &w)
 			}
-
 		}
+		// TODO: panic error here
 
 	})
 }
