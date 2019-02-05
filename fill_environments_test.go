@@ -1,9 +1,7 @@
 package goconfig
 
 import (
-	"fmt"
 	"os"
-	"reflect"
 	"testing"
 )
 
@@ -40,7 +38,8 @@ func TestFillEnvironments(t *testing.T) {
 	os.Setenv("MYSTRUCT_MYITEM", "nested")
 	os.Setenv("MYEMPTY", "")
 
-	FillEnvironments(&c)
+	err := FillEnvironments(&c)
+	AssertNil(t, err)
 
 	if c.MyBoolTrue != true {
 		t.Error("MyBoolTrue should be true")
@@ -96,19 +95,35 @@ func TestFillEnvironments(t *testing.T) {
 
 }
 
-func TestFillEnvironmentsWithArrayStrings(t *testing.T) {
+func TestFillEnvironmentsWithArray(t *testing.T) {
+
+	c := struct {
+		MyStringArray []string
+	}{
+		[]string{"four", "five", "six"},
+	}
+
+	os.Setenv("MYSTRINGARRAY", `["one", "two", "three"]`)
+
+	err := FillEnvironments(&c)
+	AssertNil(t, err)
+
+	AssertEqual(t, c.MyStringArray, []string{"one", "two", "three"})
+
+}
+
+func TestFillEnvironmentsWithArrayMalformed(t *testing.T) {
 
 	c := struct {
 		MyStringArray []string
 	}{}
 
-	os.Setenv("MYSTRINGARRAY", `["one", "two", "three"]`)
+	os.Setenv("MYSTRINGARRAY", `}`)
 
-	FillEnvironments(&c)
+	err := FillEnvironments(&c)
+	AssertNotNil(t, err)
 
-	fmt.Println(c)
+	AssertEqual(t, err.Error(), "'MYSTRINGARRAY' should be a JSON"+
+		" array: invalid character '}' looking for beginning of value")
 
-	if !reflect.DeepEqual(c.MyStringArray, []string{"one", "two", "three"}) {
-		t.Error("MyStringArrayshould be [one, two, three]")
-	}
 }
