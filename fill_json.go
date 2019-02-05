@@ -2,26 +2,25 @@ package goconfig
 
 import (
 	"encoding/json"
-	"fmt"
+	"errors"
 	"io/ioutil"
-	"os"
 )
 
-func FillJson(c interface{}, filename string) {
+func FillJson(c interface{}, filename string) error {
 
 	if "" == filename {
-		return
+		return nil
 	}
 
 	data, err := ioutil.ReadFile(filename)
 	if nil != err {
-		fmt.Println("Unable to read config file `" + filename + "`!")
-		os.Exit(1)
+		return err
 	}
 
 	err = json.Unmarshal(data, &c)
 	if nil != err {
-		fmt.Println("Config file should be a valid JSON")
-		os.Exit(1)
+		return errors.New("Bad json file: " + err.Error())
 	}
+
+	return nil
 }

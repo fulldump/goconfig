@@ -1,13 +1,17 @@
 package goconfig
 
 import (
+	"encoding/json"
+	"errors"
+	"fmt"
 	"os"
 	"reflect"
 	"strconv"
 	"strings"
 )
 
-func FillEnvironments(c interface{}) {
+func FillEnvironments(c interface{}) (err error) {
+
 	traverse(c, func(i item) {
 		env := strings.ToUpper(strings.Join(i.Path, "_"))
 		value := os.Getenv(env)
@@ -69,7 +73,18 @@ func FillEnvironments(c interface{}) {
 				set(i.Ptr, &w)
 			}
 
+		} else if reflect.Slice == i.Kind {
+			jsonErr := json.Unmarshal([]byte(value), i.Ptr)
+			if jsonErr != nil {
+				err = errors.New(fmt.Sprintf(
+					"'%s' should be a JSON array: %s",
+					env, jsonErr.Error(),
+				))
+			}
+
 		}
 
 	})
+
+	return
 }

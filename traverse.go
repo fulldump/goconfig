@@ -47,7 +47,17 @@ func traverse_recursive(c interface{}, f callback, p []string) {
 			traverse_recursive(ptr, f, pr)
 
 		} else if reflect.Slice == kind {
-			panic("Slice is not supported by goconfig at this moment.")
+			//panic("Slice is not supported by goconfig at this moment.")
+			f(item{
+				FieldName: name,
+				Usage:     usage,
+				Ptr:       ptr,
+				Kind:      kind,
+				Path:      pr,
+				Value:     value,
+			})
+
+			traverse_array(ptr, f, pr)
 		} else {
 			f(item{
 				FieldName: name,
@@ -65,5 +75,9 @@ func traverse_recursive(c interface{}, f callback, p []string) {
 		//p = p[0 : len(p)-1]
 
 	}
+
+}
+
+func traverse_array(c interface{}, f callback, p []string) {
 
 }

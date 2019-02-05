@@ -2,11 +2,16 @@
 
 <p align="center">
 <a href="https://travis-ci.org/fulldump/goconfig"><img src="https://travis-ci.org/fulldump/goconfig.svg?branch=master"></a>
+<a href="https://cover.run/go?tag=golang-1.10&repo=github.com%2Ffulldump%2Fgoconfig"><img src="/go/github.com/fulldump/goconfig.svg?style=flat&amp;tag=golang-1.10&amp;d=1549396252922"></a>
 <a href="https://goreportcard.com/report/fulldump/goconfig"><img src="http://goreportcard.com/badge/fulldump/goconfig"></a>
 <a href="https://godoc.org/github.com/fulldump/goconfig"><img src="https://godoc.org/github.com/fulldump/goconfig?status.svg" alt="GoDoc"></a>
+<a href="https://codeclimate.com/github/fulldump/goconfig/maintainability"><img src="https://api.codeclimate.com/v1/badges/d3f50778ac8598d4438f/maintainability"></a>
 </p>
 
-Goconfig is an extremely simple configuration library for your Go programs.
+Goconfig is an extremely simple and powerful configuration library for your Go
+programs that read values from environment vars, command line arguments and
+configuration file in JSON.
+
 Make your configuration flags compact and easy to read.
 
 Arguments are parsed from command line with the standard `flag` library.
@@ -100,10 +105,9 @@ Mainly almost all types from `flag` library are supported:
 * uint64
 * uint
 * struct (hyerarchical keys)
+* array (any type)
 
 For the moment `duration` type is not supported.
-
-Type `slice` or `array` is also being considered.
 
 
 # Builtin flags
@@ -132,6 +136,7 @@ configuration above, this is a sample config.json file:
 Configuration precedence is as follows (higher to lower):
 * Arg command line
 * Json config file
+* Environment variable
 * Default value
 
 
@@ -146,8 +151,6 @@ or email me for new features, issues or whatever.
 # Testing
 
 This command will pass all tests.
-
-No tests are expected for the moment.
 
 ```sh
 make

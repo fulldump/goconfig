@@ -1,6 +1,8 @@
 package goconfig
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestFillJson(t *testing.T) {
 
@@ -23,5 +25,14 @@ func TestFillJson(t *testing.T) {
 	}{}
 
 	FillJson(c, "")
+
+}
+
+func TestFillJson_UnexistingFilename(t *testing.T) {
+
+	c := struct{}{}
+
+	err := FillJson(&c, "/")
+	AssertNotNil(t, err)
 
 }

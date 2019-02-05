@@ -1,22 +1,32 @@
 package goconfig
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
 	"flag"
+	"fmt"
 	"os"
 	"reflect"
 	"strings"
-	"fmt"
 )
 
 var values = map[string]interface{}{}
 
-func FillArgs(c interface{}, args []string) {
+type postFillArgs struct {
+	item
+	Raw *string
+}
+
+func FillArgs(c interface{}, args []string) error {
 	var f = flag.NewFlagSet(os.Args[0], flag.ContinueOnError)
 	f.Usage = func() {}
 	f.SetOutput(os.Stdout)
 
 	// Default config flag
 	f.String("config", "", "Configuration JSON file")
+
+	post := []postFillArgs{}
 
 	traverse(c, func(i item) {
 		name_path := strings.ToLower(strings.Join(i.Path, "."))
@@ -43,7 +53,16 @@ func FillArgs(c interface{}, args []string) {
 			f.UintVar(i.Ptr.(*uint), name_path, i.Value.Interface().(uint), i.Usage)
 
 		} else if reflect.Slice == i.Kind {
-			panic("Slice is not supported by goconfig at this moment.")
+
+			b, _ := json.Marshal(i.Value.Interface())
+
+			value := ""
+			f.StringVar(&value, name_path, string(b), i.Usage)
+
+			post = append(post, postFillArgs{
+				Raw:  &value,
+				item: i,
+			})
 
 		} else {
 			panic("Kind `" + i.Kind.String() +
@@ -53,9 +72,23 @@ func FillArgs(c interface{}, args []string) {
 	})
 
 	if err := f.Parse(args); err != nil && err == flag.ErrHelp {
-		f.SetOutput(os.Stderr)
-		fmt.Fprint(os.Stderr, "Usage of goconfig:\n\n")
+		m := bytes.NewBufferString("Usage of goconfig:\n\n")
+		f.SetOutput(m)
 		f.PrintDefaults()
-		os.Exit(1)
+		return errors.New(m.String())
 	}
+
+	// Postprocess flags: unsupported flags needs to be declared as string
+	// and parsed later. Here is the place.
+	for _, p := range post {
+		err := json.Unmarshal([]byte(*p.Raw), p.Ptr)
+		if err != nil {
+			return errors.New(fmt.Sprintf(
+				"'%s' should be a JSON array: %s",
+				p.FieldName, err.Error(),
+			))
+		}
+	}
+
+	return nil
 }

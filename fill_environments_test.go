@@ -38,7 +38,8 @@ func TestFillEnvironments(t *testing.T) {
 	os.Setenv("MYSTRUCT_MYITEM", "nested")
 	os.Setenv("MYEMPTY", "")
 
-	FillEnvironments(&c)
+	err := FillEnvironments(&c)
+	AssertNil(t, err)
 
 	if c.MyBoolTrue != true {
 		t.Error("MyBoolTrue should be true")
@@ -91,5 +92,38 @@ func TestFillEnvironments(t *testing.T) {
 	if c.MyStruct.MyItem != "nested" {
 		t.Error("MyStruct.MyItem should be 'nested'")
 	}
+
+}
+
+func TestFillEnvironmentsWithArray(t *testing.T) {
+
+	c := struct {
+		MyStringArray []string
+	}{
+		[]string{"four", "five", "six"},
+	}
+
+	os.Setenv("MYSTRINGARRAY", `["one", "two", "three"]`)
+
+	err := FillEnvironments(&c)
+	AssertNil(t, err)
+
+	AssertEqual(t, c.MyStringArray, []string{"one", "two", "three"})
+
+}
+
+func TestFillEnvironmentsWithArrayMalformed(t *testing.T) {
+
+	c := struct {
+		MyStringArray []string
+	}{}
+
+	os.Setenv("MYSTRINGARRAY", `}`)
+
+	err := FillEnvironments(&c)
+	AssertNotNil(t, err)
+
+	AssertEqual(t, err.Error(), "'MYSTRINGARRAY' should be a JSON"+
+		" array: invalid character '}' looking for beginning of value")
 
 }

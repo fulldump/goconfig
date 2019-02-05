@@ -12,7 +12,9 @@ setup:
 	ln -s ../../.. src/$(PROJECT)
 
 test:
-	$(GOCMD) test $(PROJECT) -cover
+	$(GOCMD) version
+	$(GOCMD) env
+	$(GOCMD) test -v $(PROJECT)
 
 example:
 	$(GOCMD) install $(PROJECT)/example
