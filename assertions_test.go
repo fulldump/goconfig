@@ -65,5 +65,10 @@ func GetStackLine(linesToSkip int) string {
 			index = i + 1
 		}
 	}
-	return lines[linesToSkip*2+3] + "\n" + lines[linesToSkip*2+4]
+
+	if linesToSkip >= len(lines) {
+		return ""
+	}
+
+	return lines[linesToSkip]
 }
