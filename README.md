@@ -2,7 +2,7 @@
 
 <p align="center">
 <a href="https://travis-ci.org/fulldump/goconfig"><img src="https://travis-ci.org/fulldump/goconfig.svg?branch=master"></a>
-<a href="https://cover.run/go?tag=golang-1.10&repo=github.com%2Ffulldump%2Fgoconfig"><img src="/go/github.com/fulldump/goconfig.svg?style=flat&amp;tag=golang-1.10&amp;d=1549396252922"></a>
+<a href="https://cover.run/go?tag=golang-1.10&repo=github.com%2Ffulldump%2Fgoconfig"><img src="https://cover.run/go/github.com/fulldump/goconfig.svg?style=flat&amp;tag=golang-1.10&amp;d=1549396252922"></a>
 <a href="https://goreportcard.com/report/fulldump/goconfig"><img src="http://goreportcard.com/badge/fulldump/goconfig"></a>
 <a href="https://godoc.org/github.com/fulldump/goconfig"><img src="https://godoc.org/github.com/fulldump/goconfig?status.svg" alt="GoDoc"></a>
 <a href="https://codeclimate.com/github/fulldump/goconfig/maintainability"><img src="https://api.codeclimate.com/v1/badges/d3f50778ac8598d4438f/maintainability"></a>
