@@ -3,6 +3,7 @@ package goconfig
 import (
 	"os"
 	"testing"
+	"time"
 )
 
 func TestFillEnvironments(t *testing.T) {
@@ -22,6 +23,7 @@ func TestFillEnvironments(t *testing.T) {
 		MyStruct    struct {
 			MyItem string
 		}
+		MyDuration time.Duration
 	}{}
 
 	os.Setenv("MYBOOLTRUE", "true")
@@ -37,6 +39,7 @@ func TestFillEnvironments(t *testing.T) {
 	os.Setenv("MYUINT", "4444")
 	os.Setenv("MYSTRUCT_MYITEM", "nested")
 	os.Setenv("MYEMPTY", "")
+	os.Setenv("MYDURATION", "15s")
 
 	err := FillEnvironments(&c)
 	AssertNil(t, err)
@@ -91,6 +94,10 @@ func TestFillEnvironments(t *testing.T) {
 
 	if c.MyStruct.MyItem != "nested" {
 		t.Error("MyStruct.MyItem should be 'nested'")
+	}
+
+	if c.MyDuration.String() != "15s" {
+		t.Error("MyDuration should be '15s'")
 	}
 
 }

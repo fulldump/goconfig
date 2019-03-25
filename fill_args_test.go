@@ -2,6 +2,7 @@ package goconfig
 
 import (
 	"testing"
+	"time"
 )
 
 func TestFillArgs(t *testing.T) {
@@ -17,6 +18,7 @@ func TestFillArgs(t *testing.T) {
 		MyStruct    struct {
 			MyItem string
 		}
+		MyDuration time.Duration
 	}{}
 
 	args := []string{
@@ -29,6 +31,7 @@ func TestFillArgs(t *testing.T) {
 		"-myuint64", "64",
 		"-myuint", "4444",
 		"-mystruct.myitem", "nested",
+		"-myduration", "15s",
 	}
 
 	err := FillArgs(&c, args)
@@ -68,6 +71,10 @@ func TestFillArgs(t *testing.T) {
 
 	if c.MyStruct.MyItem != "nested" {
 		t.Error("MyStruct.MyItem should be 'nested'")
+	}
+
+	if c.MyDuration.String() != "15s" {
+		t.Error("MyDuration should be 15s")
 	}
 
 }

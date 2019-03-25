@@ -8,6 +8,7 @@ import (
 	"reflect"
 	"strconv"
 	"strings"
+	"time"
 )
 
 func FillEnvironments(c interface{}) (err error) {
@@ -20,7 +21,13 @@ func FillEnvironments(c interface{}) (err error) {
 			return
 		}
 
-		if reflect.Bool == i.Kind {
+		if reflect.TypeOf(time.Duration(0)) == i.Value.Type() {
+			if d, err := time.ParseDuration(value); err == nil {
+				v := int64(d)
+				set(i.Ptr, &v)
+			}
+
+		} else if reflect.Bool == i.Kind {
 			if v, err := strconv.ParseBool(value); nil == err {
 				set(i.Ptr, &v)
 			}

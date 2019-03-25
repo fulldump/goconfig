@@ -14,6 +14,7 @@ type item struct {
 	Kind      reflect.Kind
 	Path      []string
 	Value     reflect.Value
+	Tags      reflect.StructTag
 }
 
 func traverse(c interface{}, f callback) {
@@ -80,4 +81,33 @@ func traverse_recursive(c interface{}, f callback, p []string) {
 
 func traverse_array(c interface{}, f callback, p []string) {
 
+}
+
+func traverse_json(c interface{}, f callback) {
+
+	t := reflect.ValueOf(c)
+
+	// Follow pointers
+	for reflect.Ptr == t.Kind() {
+		t = t.Elem()
+	}
+
+	for i := 0; i < t.NumField(); i++ {
+		field := t.Type().Field(i)
+		name := field.Name
+		value := t.Field(i)
+		usage := field.Tag.Get("usage")
+		ptr := value.Addr().Interface()
+		kind := value.Kind()
+		tags := field.Tag
+
+		f(item{
+			FieldName: name,
+			Usage:     usage,
+			Ptr:       ptr,
+			Kind:      kind,
+			Value:     value,
+			Tags:      tags,
+		})
+	}
 }
