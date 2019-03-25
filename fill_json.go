@@ -41,8 +41,8 @@ func unmarshalJSON(data []byte, c interface{}) error {
 		}
 
 		traverse_json(c, func(i item) {
-			tag, ok := i.Tags.Lookup("json")
-			if ok {
+			tag := i.Tags.Get("json")
+			if len(tag) > 0 {
 				if i := strings.Index(tag, ","); i != -1 {
 					tag = tag[:i]
 				}
