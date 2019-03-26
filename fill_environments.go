@@ -22,7 +22,7 @@ func FillEnvironments(c interface{}) (err error) {
 		}
 
 		if reflect.TypeOf(time.Duration(0)) == i.Value.Type() {
-			if d, err := time.ParseDuration(value); err == nil {
+			if d, err := unmarshalDurationString(value); err == nil {
 				v := int64(d)
 				set(i.Ptr, &v)
 			}

@@ -18,7 +18,8 @@ func TestFillArgs(t *testing.T) {
 		MyStruct    struct {
 			MyItem string
 		}
-		MyDuration time.Duration
+		MyDurationNano   time.Duration
+		MyDurationString time.Duration
 	}{}
 
 	args := []string{
@@ -31,7 +32,8 @@ func TestFillArgs(t *testing.T) {
 		"-myuint64", "64",
 		"-myuint", "4444",
 		"-mystruct.myitem", "nested",
-		"-myduration", "15s",
+		"-mydurationnano", "15000000000",
+		"-mydurationstring", "15s",
 	}
 
 	err := FillArgs(&c, args)
@@ -73,8 +75,12 @@ func TestFillArgs(t *testing.T) {
 		t.Error("MyStruct.MyItem should be 'nested'")
 	}
 
-	if c.MyDuration.String() != "15s" {
-		t.Error("MyDuration should be 15s")
+	if c.MyDurationNano.String() != "15s" {
+		t.Error("MyDurationNano should be 15s")
+	}
+
+	if c.MyDurationString.String() != "15s" {
+		t.Error("MyDurationString should be 15s")
 	}
 
 }

@@ -93,10 +93,10 @@ func FillArgs(c interface{}, args []string) error {
 	for _, p := range post {
 		// Special case for durations
 		if reflect.TypeOf(time.Duration(0)) == p.Value.Type() {
-			d, err := time.ParseDuration(*p.Raw)
+			d, err := unmarshalDurationString(*p.Raw)
 			if err != nil {
 				return fmt.Errorf(
-					"'%s' should be a time.Duration string: %s",
+					"'%s' should be nanoseconds or a time.Duration string: %s",
 					p.FieldName, err.Error(),
 				)
 			}

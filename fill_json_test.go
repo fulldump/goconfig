@@ -24,7 +24,9 @@ const test_fill_json = `{
 	"MyStruct": {
 		"MyItem": "nested"
 	},
-	"MyDuration": "15s",
+	"MyDuration": 15000000000,
+	"MyDurationString": "15s",
+	"MyDurationNanoString": "15000000000",
 	"my_tag": "tag",
 	"myalternatecase": "lower",
 	"MyArray": [
@@ -60,11 +62,13 @@ func TestFillJson(t *testing.T) {
 		MyStruct    struct {
 			MyItem string
 		}
-		MyDuration      time.Duration
-		MyTag           string `json:"my_tag"`
-		MyAlternateCase string
-		MyArray         []int
-		MyUnmarshaler   testJsonUnmarshaler
+		MyDuration           time.Duration
+		MyDurationString     time.Duration
+		MyDurationNanoString time.Duration
+		MyTag                string `json:"my_tag"`
+		MyAlternateCase      string
+		MyArray              []int
+		MyUnmarshaler        testJsonUnmarshaler
 	}{}
 
 	err = FillJson(&c, f.Name())
@@ -108,6 +112,14 @@ func TestFillJson(t *testing.T) {
 
 	if c.MyDuration.String() != "15s" {
 		t.Error("MyDuration should be 15s")
+	}
+
+	if c.MyDurationString.String() != "15s" {
+		t.Error("MyDurationString should be 15s")
+	}
+
+	if c.MyDurationNanoString.String() != "15s" {
+		t.Error("MyDurationNanoString should be 15s")
 	}
 
 	if c.MyTag != "tag" {

@@ -3,7 +3,6 @@ package goconfig
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io/ioutil"
 	"reflect"
 	"strings"
@@ -63,16 +62,21 @@ func unmarshalJSON(data []byte, c interface{}) error {
 				unmarshalJSON(value, i.Ptr)
 
 			} else if reflect.TypeOf(time.Duration(0)) == i.Value.Type() {
-				tmp := ""
-				if err := json.Unmarshal(value, &tmp); err != nil {
-					fmt.Println(err)
-					return
+				var d time.Duration
+				// try nanosecond int, then duration string
+				if err := json.Unmarshal(value, &d); err != nil {
+					tmp := ""
+					if err := json.Unmarshal(value, &tmp); err != nil {
+						return
+					}
+
+					if d, err = unmarshalDurationString(tmp); err != nil {
+						return
+					}
 				}
 
-				if d, err := time.ParseDuration(tmp); err == nil {
-					v := int64(d)
-					set(i.Ptr, &v)
-				}
+				v := int64(d)
+				set(i.Ptr, &v)
 
 			} else {
 				json.Unmarshal(value, i.Ptr)
