@@ -9,6 +9,7 @@ import (
 	"os"
 	"reflect"
 	"strings"
+	"time"
 )
 
 var values = map[string]interface{}{}
@@ -31,7 +32,16 @@ func FillArgs(c interface{}, args []string) error {
 	traverse(c, func(i item) {
 		name_path := strings.ToLower(strings.Join(i.Path, "."))
 
-		if reflect.Bool == i.Kind {
+		if reflect.TypeOf(time.Duration(0)) == i.Value.Type() {
+			value := ""
+			f.StringVar(&value, name_path, i.Value.Interface().(time.Duration).String(), i.Usage)
+
+			post = append(post, postFillArgs{
+				Raw:  &value,
+				item: i,
+			})
+
+		} else if reflect.Bool == i.Kind {
 			f.BoolVar(i.Ptr.(*bool), name_path, i.Value.Interface().(bool), i.Usage)
 
 		} else if reflect.Float64 == i.Kind {
@@ -81,6 +91,20 @@ func FillArgs(c interface{}, args []string) error {
 	// Postprocess flags: unsupported flags needs to be declared as string
 	// and parsed later. Here is the place.
 	for _, p := range post {
+		// Special case for durations
+		if reflect.TypeOf(time.Duration(0)) == p.Value.Type() {
+			d, err := unmarshalDurationString(*p.Raw)
+			if err != nil {
+				return fmt.Errorf(
+					"'%s' should be nanoseconds or a time.Duration string: %s",
+					p.FieldName, err.Error(),
+				)
+			}
+			p.Value.SetInt(int64(d))
+
+			continue
+		}
+
 		err := json.Unmarshal([]byte(*p.Raw), p.Ptr)
 		if err != nil {
 			return errors.New(fmt.Sprintf(
