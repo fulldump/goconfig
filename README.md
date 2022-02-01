@@ -7,8 +7,6 @@
 <a href="https://codeclimate.com/github/fulldump/goconfig/maintainability"><img src="https://api.codeclimate.com/v1/badges/d3f50778ac8598d4438f/maintainability"></a>
 </p>
 
-[![Go Report Card](https://goreportcard.com/badge/github.com/fulldump/goconfig)](https://goreportcard.com/report/github.com/fulldump/goconfig)
-
 https://goreportcard.com/badge/github.com/fulldump/goconfig
 
 Goconfig is an extremely simple and powerful configuration library for your Go
