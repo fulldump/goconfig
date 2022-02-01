@@ -1,6 +1,6 @@
 PROJECT = github.com/fulldump/goconfig
 
-GOCMD=GOPATH=`pwd` go
+GOCMD=go
 
 .PHONY: all setup test coverage example
 
