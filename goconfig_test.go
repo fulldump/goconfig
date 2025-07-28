@@ -3,6 +3,7 @@ package goconfig
 import (
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"testing"
 	"time"
 )
@@ -118,4 +119,32 @@ func TestFillJsonAnonymousStructs(t *testing.T) {
 	if cfg.Server.Other.Timeout.String() != "3s" {
 		t.Errorf("expected '3s', got '%s'", cfg.Server.Other.Timeout.String())
 	}
+
+}
+
+func TestReadWithError_ImplicitConfig(t *testing.T) {
+
+	dir, err := os.MkdirTemp("", "goconfig-implicit")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer os.RemoveAll(dir)
+
+	file := filepath.Join(dir, "config.json")
+	if err := os.WriteFile(file, []byte(`{"value":"file"}`), 0644); err != nil {
+		t.Fatal(err)
+	}
+
+	cwd, _ := os.Getwd()
+	os.Chdir(dir)
+	defer os.Chdir(cwd)
+
+	os.Args = []string{"cmd"}
+	os.Unsetenv("VALUE")
+
+	c := struct{ Value string }{}
+	err = readWithError(&c)
+	AssertNil(t, err)
+
+	AssertEqual(t, c.Value, "file")
 }
