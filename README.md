@@ -1,125 +1,118 @@
-<img src="logo.png">
+# Goconfig
+
+![Logo](logo.png)
 
 <p align="center">
 <a href="https://app.travis-ci.com/github/fulldump/goconfig"><img src="https://app.travis-ci.com/fulldump/goconfig.svg?branch=master"></a>
 <a href="https://goreportcard.com/report/github.com/fulldump/goconfig"><img src="https://goreportcard.com/badge/github.com/fulldump/goconfig"></a>
 <a href="https://godoc.org/github.com/fulldump/goconfig"><img src="https://godoc.org/github.com/fulldump/goconfig?status.svg" alt="GoDoc"></a>
-<a href="https://codeclimate.com/github/fulldump/goconfig/maintainability"><img src="https://api.codeclimate.com/v1/badges/d3f50778ac8598d4438f/maintainability"></a>
 </p>
 
-Goconfig is an extremely simple and powerful configuration library for your Go
-programs that read values from environment vars, command line arguments and
-configuration file in JSON.
 
-Make your configuration flags compact and easy to read.
+`goconfig` is a lightweight library that populates your Go structs from command
+line flags, environment variables and JSON configuration files. It aims to make
+configuration straightforward while keeping your code idiomatic.
 
-Arguments are parsed from command line with the standard `flag` library.
+## Features
 
-<!-- MarkdownTOC autolink=true bracket=round depth=4 -->
+- Unified configuration from flags, environment variables and JSON files
+- Hierarchical keys using struct fields
+- Supports arrays, `time.Duration`, and most native flag types
+- Auto-generated `-help` with usage information
 
-- [How to use](#how-to-use)
-- [Supported types](#supported-types)
-- [Builtin flags](#builtin-flags)
-  - [-help](#-help)
-  - [-config](#-config)
-- [Contribute](#contribute)
-- [Testing](#testing)
-- [Example project](#example-project)
+## Installation
 
-<!-- /MarkdownTOC -->
+```bash
+go get github.com/fulldump/goconfig
+```
 
+## Quick Start
 
-# How to use
-
-Define your structure with **descriptions**:
+Define your configuration struct with descriptive tags:
 
 ```go
 type myconfig struct {
-	Name      string `usage:"The name of something"`
-	EnableLog bool   `usage:"Enable logging into logdb" json:"enable_log"`
-	MaxProcs  int    `usage:"Maximum number of procs"`
-	UsersDB   db
-	LogDB     db
+        Name      string `usage:"The name of something"`
+        EnableLog bool   `usage:"Enable logging into logdb" json:"enable_log"`
+        MaxProcs  int    `usage:"Maximum number of procs"`
+        UsersDB   db
+        LogDB     db
 }
 
 type db struct {
-	Host string `usage:"Host where db is located"`
-	User string `usage:"Database user"`
-	Pass string `usage:"Database password"`
+        Host string `usage:"Host where db is located"`
+        User string `usage:"Database user"`
+        Pass string `usage:"Database password"`
 }
 ```
 
-Instance your config with **default values**:
+Provide defaults and read the configuration:
 
 ```go
 c := &myconfig{
-	EnableLog: true,
-	UsersDB: db{
-		Host: "localhost",
-		User: "root",
-		Pass: "123456",
-	},
+        EnableLog: true,
+        UsersDB: db{
+                Host: "localhost",
+                User: "root",
+                Pass: "123456",
+        },
 }
-```
 
-**Fill** your config:
-```go
 goconfig.Read(c)
 ```
 
-How the `-help` looks like:
+Running your program with `-help` prints automatically generated help text:
 
 ```
 Usage of example:
   -enablelog
-    	Enable logging into logdb (default true)
+        Enable logging into logdb (default true)
   -logdb.host string
-    	Host where db is located (default "localhost")
+        Host where db is located (default "localhost")
   -logdb.pass string
-    	Database password (default "123456")
+        Database password (default "123456")
   -logdb.user string
-    	Database user (default "root")
+        Database user (default "root")
   -maxprocs int
-    	Maximum number of procs
+        Maximum number of procs
   -name string
-    	The name of something
+        The name of something
   -usersdb.host string
-    	Host where db is located
+        Host where db is located
   -usersdb.pass string
-    	Database password
+        Database password
   -usersdb.user string
-    	Database user
+        Database user
 ```
 
+## Supported Types
 
-# Supported types
+`goconfig` supports the basic types from the `flag` package plus arrays and
+nested structs:
 
-Mainly almost all types from `flag` library are supported:
+- bool
+- float64
+- int64
+- int
+- string
+- uint64
+- uint
+- struct (hierarchical keys)
+- array (any type)
 
-* bool
-* float64
-* int64
-* int
-* string
-* uint64
-* uint
-* struct (hyerarchical keys)
-* array (any type)
+The `time.Duration` type is fully supported and can be provided as a
+duration string (e.g. `"15s"`) or as nanoseconds.
 
-For the moment `duration` type is not supported.
+## Built-in Flags
 
+### `-help`
 
-# Builtin flags
+Uses the standard `flag` behaviour to display help.
 
-## -help
+### `-config`
 
-Since `flag` library is using the key `-help` to show usage, Goconf is behaving
-in the same way.
-
-## -config
-
-Builtin flag `-config` allow read configuration from a file. For the example
-configuration above, this is a sample config.json file:
+Read configuration from a JSON file. Given the previous configuration structure,
+a sample `config.json` looks like:
 
 ```json
 {
@@ -132,37 +125,37 @@ configuration above, this is a sample config.json file:
 }
 ```
 
-If the `-config` flag is not provided, Goconfig will look for a file named
+If the -config flag is not provided, Goconfig will look for a file named
 `config.json` in the current working directory and load it if present.
 
-Configuration precedence is as follows (higher to lower):
-* Arg command line
-* Json config file
-* Environment variable
-* Default value
+Configuration precedence (highest to lowest):
+1. Command line arguments
+2. Environment variables
+3. JSON config file
+4. Default values
 
+## Contributing
 
-# Contribute
+Contributions are welcome! Feel free to fork the repository, submit pull
+requests, or [open an issue](https://github.com/fulldump/goconfig/issues) if you
+encounter problems or have suggestions.
 
-Feel free to fork, make changes and pull-request to master branch.
+### Testing
 
-If you prefer, [create a new issue](https://github.com/fulldump/goconfig/releases/new)
-or email me for new features, issues or whatever.
+Run the full test suite with:
 
-
-# Testing
-
-This command will pass all tests.
-
-```sh
+```bash
 make
 ```
 
+### Example Project
 
-# Example project
+This repository includes a small example. Build it with:
 
-This project includes a sample project with a sample configuration. To make the binary:
-
-```sh
+```bash
 make example
 ```
+
+## License
+
+Goconfig is released under the [MIT License](LICENSE).
