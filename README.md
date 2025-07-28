@@ -132,6 +132,9 @@ configuration above, this is a sample config.json file:
 }
 ```
 
+If the `-config` flag is not provided, Goconfig will look for a file named
+`config.json` in the current working directory and load it if present.
+
 Configuration precedence is as follows (higher to lower):
 * Arg command line
 * Json config file

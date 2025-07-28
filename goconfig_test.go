@@ -2,6 +2,7 @@ package goconfig
 
 import (
 	"os"
+	"path/filepath"
 	"testing"
 )
 
@@ -77,4 +78,31 @@ func TestReadWithError_FileError(t *testing.T) {
 
 	AssertEqual(t, err.Error(), "Config file error: "+
 		"read /: is a directory")
+}
+
+func TestReadWithError_ImplicitConfig(t *testing.T) {
+
+	dir, err := os.MkdirTemp("", "goconfig-implicit")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer os.RemoveAll(dir)
+
+	file := filepath.Join(dir, "config.json")
+	if err := os.WriteFile(file, []byte(`{"value":"file"}`), 0644); err != nil {
+		t.Fatal(err)
+	}
+
+	cwd, _ := os.Getwd()
+	os.Chdir(dir)
+	defer os.Chdir(cwd)
+
+	os.Args = []string{"cmd"}
+	os.Unsetenv("VALUE")
+
+	c := struct{ Value string }{}
+	err = readWithError(&c)
+	AssertNil(t, err)
+
+	AssertEqual(t, c.Value, "file")
 }

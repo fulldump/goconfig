@@ -23,6 +23,12 @@ func readWithError(c interface{}) error {
 	filename := f.String("config", "", "-usage-")
 	f.Parse(os.Args[1:])
 
+	if *filename == "" {
+		if _, err := os.Stat("config.json"); err == nil {
+			*filename = "config.json"
+		}
+	}
+
 	// Read from file JSON
 	if err := FillJson(c, *filename); err != nil {
 		return errors.New("Config file error: " + err.Error())
