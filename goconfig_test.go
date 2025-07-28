@@ -1,9 +1,11 @@
 package goconfig
 
 import (
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
+	"time"
 )
 
 func TestRead(t *testing.T) {
@@ -78,6 +80,46 @@ func TestReadWithError_FileError(t *testing.T) {
 
 	AssertEqual(t, err.Error(), "Config file error: "+
 		"read /: is a directory")
+}
+
+func TestFillJsonAnonymousStructs(t *testing.T) {
+	f, err := ioutil.TempFile("", "test-nested-*.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer f.Close()
+	if _, err := f.WriteString(`{"Name":"Fulanez", "timeout":20000000, "server":{"Other": {"name":"Gonzo", "timeout":"3s"} }}`); err != nil {
+		t.Fatal(err)
+	}
+
+	type AnonymousStruct struct {
+		Name    string
+		Timeout time.Duration
+	}
+
+	cfg := struct {
+		AnonymousStruct
+		Server struct {
+			Port  int
+			Other AnonymousStruct
+		}
+	}{}
+
+	err = FillJson(&cfg, f.Name())
+	AssertNil(t, err)
+	if cfg.Name != "Fulanez" {
+		t.Errorf("expected 'Fulanez', got '%s'", cfg.Name)
+	}
+	if cfg.Timeout.String() != "20ms" {
+		t.Errorf("expected '20ms', got '%s'", cfg.Timeout.String())
+	}
+	if cfg.Server.Other.Name != "Gonzo" {
+		t.Errorf("expected 'Gonzo', got '%s'", cfg.Server.Other.Name)
+	}
+	if cfg.Server.Other.Timeout.String() != "3s" {
+		t.Errorf("expected '3s', got '%s'", cfg.Server.Other.Timeout.String())
+	}
+
 }
 
 func TestReadWithError_ImplicitConfig(t *testing.T) {
