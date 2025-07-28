@@ -158,3 +158,29 @@ func (c *testJsonUnmarshaler) UnmarshalJSON(data []byte) error {
 	*c = testJsonUnmarshaler(tmp)
 	return nil
 }
+
+func TestFillJson_AnonymousStruct(t *testing.T) {
+	f, err := ioutil.TempFile("", "test-fill-json-anon-*.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer f.Close()
+	if _, err = f.WriteString(`{"Name":"Fulanez"}`); err != nil {
+		t.Fatal(err)
+	}
+
+	type AnonymousStruct struct {
+		Name string
+	}
+
+	cfg := struct {
+		AnonymousStruct
+	}{}
+
+	err = FillJson(&cfg, f.Name())
+	AssertNil(t, err)
+
+	if cfg.Name != "Fulanez" {
+		t.Error("Name should be 'Fulanez'")
+	}
+}

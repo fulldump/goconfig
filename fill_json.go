@@ -47,6 +47,13 @@ func unmarshalJSON(data []byte, c interface{}) error {
 				}
 			}
 
+			// If the field is an anonymous struct without tag,
+			// treat its fields as part of the current level
+			if i.Anonymous && tag == "" && (i.Kind == reflect.Struct || (i.Kind == reflect.Ptr && i.Value.Type().Elem().Kind() == reflect.Struct)) {
+				unmarshalJSON(data, i.Ptr)
+				return
+			}
+
 			var value json.RawMessage
 			if v, ok := values[tag]; ok {
 				value = v
@@ -58,7 +65,12 @@ func unmarshalJSON(data []byte, c interface{}) error {
 				return
 			}
 
-			if reflect.TypeOf(i.Value.Type()).Implements(reflect.TypeOf(new(json.Unmarshaler)).Elem()) {
+			unmarshaler := reflect.TypeOf((*json.Unmarshaler)(nil)).Elem()
+
+			if reflect.PtrTo(i.Value.Type()).Implements(unmarshaler) {
+				json.Unmarshal(value, i.Ptr)
+
+			} else if i.Value.Kind() == reflect.Struct {
 				unmarshalJSON(value, i.Ptr)
 
 			} else if reflect.TypeOf(time.Duration(0)) == i.Value.Type() {
