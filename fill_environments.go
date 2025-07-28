@@ -15,9 +15,9 @@ func FillEnvironments(c interface{}) (err error) {
 
 	traverse(c, func(i item) {
 		env := strings.ToUpper(strings.Join(i.Path, "_"))
-		value := os.Getenv(env)
+		value, ok := os.LookupEnv(env)
 
-		if "" == value {
+		if !ok {
 			return
 		}
 
