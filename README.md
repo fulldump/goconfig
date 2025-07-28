@@ -66,23 +66,23 @@ Running your program with `-help` prints automatically generated help text:
 ```
 Usage of example:
   -enablelog
-        Enable logging into logdb (env ENABLELOG) (default true)
+        Enable logging into logdb [env ENABLELOG] (default true)
   -logdb.host string
-        Host where db is located (env LOGDB_HOST) (default "localhost")
+        Host where db is located [env LOGDB_HOST] (default "localhost")
   -logdb.pass string
-        Database password (env LOGDB_PASS) (default "123456")
+        Database password [env LOGDB_PASS] (default "123456")
   -logdb.user string
-        Database user (env LOGDB_USER) (default "root")
+        Database user [env LOGDB_USER] (default "root")
   -maxprocs int
-        Maximum number of procs (env MAXPROCS)
+        Maximum number of procs [env MAXPROCS]
   -name string
-        The name of something (env NAME)
+        The name of something [env NAME]
   -usersdb.host string
-        Host where db is located (env USERSDB_HOST)
+        Host where db is located [env USERSDB_HOST]
   -usersdb.pass string
-        Database password (env USERSDB_PASS)
+        Database password [env USERSDB_PASS]
   -usersdb.user string
-        Database user (env USERSDB_USER)
+        Database user [env USERSDB_USER]
 ```
 
 ## Supported Types

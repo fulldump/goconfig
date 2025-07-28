@@ -37,7 +37,7 @@ func FillArgs(c interface{}, args []string) error {
 		if usage != "" {
 			usage += " "
 		}
-		usage += "(env " + env_name + ")"
+		usage += "[env " + env_name + "]"
 
 		if reflect.TypeOf(time.Duration(0)) == i.Value.Type() {
 			value := ""
