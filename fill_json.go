@@ -58,7 +58,12 @@ func unmarshalJSON(data []byte, c interface{}) error {
 				return
 			}
 
-			if reflect.TypeOf(i.Value.Type()).Implements(reflect.TypeOf(new(json.Unmarshaler)).Elem()) {
+			unmarshaler := reflect.TypeOf((*json.Unmarshaler)(nil)).Elem()
+
+			if reflect.PtrTo(i.Value.Type()).Implements(unmarshaler) {
+				json.Unmarshal(value, i.Ptr)
+
+			} else if i.Value.Kind() == reflect.Struct {
 				unmarshalJSON(value, i.Ptr)
 
 			} else if reflect.TypeOf(time.Duration(0)) == i.Value.Type() {

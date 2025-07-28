@@ -140,3 +140,16 @@ func TestFillEnvironmentsWithArrayMalformed(t *testing.T) {
 		" array: invalid character '}' looking for beginning of value")
 
 }
+
+func TestFillEnvironmentsEmptyOverride(t *testing.T) {
+	c := struct {
+		Value string
+	}{Value: "default"}
+
+	os.Setenv("VALUE", "")
+
+	err := FillEnvironments(&c)
+	AssertNil(t, err)
+
+	AssertEqual(t, c.Value, "")
+}
