@@ -1,6 +1,7 @@
 package goconfig
 
 import (
+	"strings"
 	"testing"
 	"time"
 )
@@ -231,5 +232,26 @@ func TestFillArgsParseFail(t *testing.T) {
 
 	err := FillArgs(&c, args)
 	AssertNotNil(t, err)
+
+}
+
+func TestFillArgsHelpEnvNames(t *testing.T) {
+
+	c := struct {
+		UsersDB struct {
+			Host string `usage:"Host where Database is located"`
+			Pass string `usage:"Database password"`
+		}
+	}{}
+
+	args := []string{"-help"}
+
+	err := FillArgs(&c, args)
+	AssertNotNil(t, err)
+
+	s := err.Error()
+	if !strings.Contains(s, "USERSDB_HOST") || !strings.Contains(s, "USERSDB_PASS") {
+		t.Errorf("help output should contain environment variables: %s", s)
+	}
 
 }
