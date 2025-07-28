@@ -15,6 +15,7 @@ type item struct {
 	Path      []string
 	Value     reflect.Value
 	Tags      reflect.StructTag
+	Anonymous bool
 }
 
 func traverse(c interface{}, f callback) {
@@ -56,6 +57,7 @@ func traverse_recursive(c interface{}, f callback, p []string) {
 				Kind:      kind,
 				Path:      pr,
 				Value:     value,
+				Anonymous: field.Anonymous,
 			})
 
 			traverse_array(ptr, f, pr)
@@ -67,6 +69,7 @@ func traverse_recursive(c interface{}, f callback, p []string) {
 				Kind:      kind,
 				Path:      pr,
 				Value:     value,
+				Anonymous: field.Anonymous,
 			})
 
 		}
@@ -108,6 +111,7 @@ func traverse_json(c interface{}, f callback) {
 			Kind:      kind,
 			Value:     value,
 			Tags:      tags,
+			Anonymous: field.Anonymous,
 		})
 	}
 }
