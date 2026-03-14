@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"time"
 
 	"github.com/fulldump/goconfig"
 )
@@ -18,9 +19,10 @@ type myconfig struct {
 
 // Reusable configuration structure
 type db struct {
-	Host string `usage:"Host where db is located"`
-	User string `usage:"Database user"`
-	Pass string `usage:"Database password"`
+	Host    string        `usage:"Host where db is located"`
+	User    string        `usage:"Database user"`
+	Pass    string        `usage:"Database password"`
+	Timeout time.Duration `usage:"Timeout duration"`
 }
 
 func main() {
@@ -28,9 +30,10 @@ func main() {
 	c := &myconfig{
 		EnableLog: true,
 		LogDB: db{
-			Host: "localhost",
-			User: "root",
-			Pass: "123456",
+			Host:    "localhost",
+			User:    "root",
+			Pass:    "123456",
+			Timeout: 5 * time.Second,
 		},
 	}
 

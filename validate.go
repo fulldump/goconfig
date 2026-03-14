@@ -20,6 +20,9 @@ func validateConfigTarget(c interface{}) error {
 	}
 
 	v = reflect.Indirect(v)
+	if v.Kind() == reflect.Ptr {
+		v = reflect.Indirect(v)
+	}
 	if v.Kind() != reflect.Struct {
 		return errors.New("config target must point to a struct")
 	}
