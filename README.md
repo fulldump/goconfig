@@ -239,6 +239,7 @@ make coverage
 - Security policy: `SECURITY.md`
 - Changelog: `CHANGELOG.md`
 - Release process: `RELEASING.md`
+- Launch/promotion plan: `PROMOTION_PLAN.md`
 - Issue and PR templates: `.github/ISSUE_TEMPLATE` and `.github/pull_request_template.md`
 
 ## Contributing

@@ -5,7 +5,7 @@ developer experience.
 
 ## Q2 2026 (Now)
 
-- Stabilize and ship `v1.0.0`.
+- Stabilize and ship `v1.8.0`.
 - Improve docs with production-ready examples.
 - Standardize contribution workflows (CI, templates, policies).
 

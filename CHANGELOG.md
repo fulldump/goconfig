@@ -12,6 +12,8 @@ All notable changes to this project are documented in this file.
 - Support for pointer-to-struct fields across JSON, env and flags.
 - CI workflow on GitHub Actions with tests, vet and race detector.
 - Project governance docs: contributing guide, code of conduct, security policy.
+- Documentation recipes for API/worker/CLI usage.
+- Release and promotion playbooks.
 
 ### Changed
 
