@@ -136,6 +136,9 @@ Highest priority wins:
 3. JSON config file
 4. Struct default values
 
+If `-config` is not provided and `./config.json` exists in the current working
+directory, `goconfig` loads it automatically before env vars and flags.
+
 ## Naming Convention
 
 Given this struct:
