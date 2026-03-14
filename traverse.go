@@ -33,6 +33,10 @@ func traverse_recursive(c interface{}, f callback, p []string) {
 
 	for i := 0; i < t.NumField(); i++ {
 		field := t.Type().Field(i)
+		if field.PkgPath != "" {
+			continue
+		}
+
 		name := field.Name
 		value := t.Field(i)
 		usage := field.Tag.Get("usage")
@@ -43,10 +47,15 @@ func traverse_recursive(c interface{}, f callback, p []string) {
 		if !field.Anonymous {
 			pr = append(p, strings.ToLower(name))
 		}
-		name_path := strings.Join(p, ".")
 
 		if reflect.Struct == kind {
 			traverse_recursive(ptr, f, pr)
+
+		} else if reflect.Ptr == kind && value.Type().Elem().Kind() == reflect.Struct {
+			if value.IsNil() {
+				value.Set(reflect.New(value.Type().Elem()))
+			}
+			traverse_recursive(value.Interface(), f, pr)
 
 		} else if reflect.Slice == kind {
 			//panic("Slice is not supported by goconfig at this moment.")
@@ -74,10 +83,6 @@ func traverse_recursive(c interface{}, f callback, p []string) {
 
 		}
 
-		values[name_path] = ptr
-
-		//p = p[0 : len(p)-1]
-
 	}
 
 }
@@ -97,6 +102,10 @@ func traverse_json(c interface{}, f callback) {
 
 	for i := 0; i < t.NumField(); i++ {
 		field := t.Type().Field(i)
+		if field.PkgPath != "" {
+			continue
+		}
+
 		name := field.Name
 		value := t.Field(i)
 		usage := field.Tag.Get("usage")

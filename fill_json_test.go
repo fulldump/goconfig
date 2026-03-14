@@ -184,3 +184,27 @@ func TestFillJson_AnonymousStruct(t *testing.T) {
 		t.Error("Name should be 'Fulanez'")
 	}
 }
+
+func TestFillJson_PointerStruct(t *testing.T) {
+	f, err := ioutil.TempFile("", "test-fill-json-pointer-*.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer f.Close()
+	if _, err = f.WriteString(`{"nested":{"value":"hello"}}`); err != nil {
+		t.Fatal(err)
+	}
+
+	type nested struct {
+		Value string
+	}
+
+	cfg := struct {
+		Nested *nested
+	}{}
+
+	err = FillJson(&cfg, f.Name())
+	AssertNil(t, err)
+	AssertNotNil(t, cfg.Nested)
+	AssertEqual(t, cfg.Nested.Value, "hello")
+}

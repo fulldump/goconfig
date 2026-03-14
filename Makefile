@@ -1,25 +1,16 @@
-PROJECT = github.com/fulldump/goconfig
-
 GOCMD=go
 
-.PHONY: all setup test coverage example
+.PHONY: all test coverage example
 
-all:	test
-
-setup:
-	mkdir -p src/$(PROJECT)
-	rmdir src/$(PROJECT)
-	ln -s ../../.. src/$(PROJECT)
+all: test
 
 test:
 	$(GOCMD) version
-	$(GOCMD) env
-	$(GOCMD) test -v $(PROJECT)
+	$(GOCMD) test ./...
 
 example:
-	$(GOCMD) install $(PROJECT)/example
+	$(GOCMD) run ./example -help
 
 coverage:
-	$(GOCMD) test ./src/github.com/fulldump/goconfig -cover -covermode=count -coverprofile=coverage.out; \
+	$(GOCMD) test ./... -cover -covermode=count -coverprofile=coverage.out; \
 	$(GOCMD) tool cover -html=coverage.out
-

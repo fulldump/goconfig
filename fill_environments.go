@@ -12,10 +12,21 @@ import (
 )
 
 func FillEnvironments(c interface{}) (err error) {
+	if err := validateConfigTarget(c); err != nil {
+		return err
+	}
+
+	return fillEnvironmentsWithLookup(c, os.LookupEnv)
+}
+
+func fillEnvironmentsWithLookup(c interface{}, lookup func(string) (string, bool)) (err error) {
+	if lookup == nil {
+		lookup = os.LookupEnv
+	}
 
 	traverse(c, func(i item) {
 		env := strings.ToUpper(strings.Join(i.Path, "_"))
-		value, ok := os.LookupEnv(env)
+		value, ok := lookup(env)
 
 		if !ok {
 			return

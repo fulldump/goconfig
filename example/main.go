@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"os"
+	"log"
 
 	"github.com/fulldump/goconfig"
 )
@@ -24,9 +24,6 @@ type db struct {
 }
 
 func main() {
-
-	fmt.Printf("%#v\n", os.Args)
-
 	// Default configuration
 	c := &myconfig{
 		EnableLog: true,
@@ -37,7 +34,9 @@ func main() {
 		},
 	}
 
-	goconfig.Read(c)
+	if err := goconfig.Load(c); err != nil {
+		log.Fatal(err)
+	}
 
 	fmt.Printf("%#v\n", c)
 }

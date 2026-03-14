@@ -1,6 +1,7 @@
 package goconfig
 
 import (
+	"math"
 	"strings"
 	"testing"
 	"time"
@@ -254,4 +255,65 @@ func TestFillArgsHelpEnvNames(t *testing.T) {
 		t.Errorf("help output should contain environment variables: %s", s)
 	}
 
+}
+
+func TestFillArgsWith32BitNumbers(t *testing.T) {
+	c := struct {
+		MyFloat32 float32
+		MyInt32   int32
+		MyUint32  uint32
+	}{}
+
+	err := FillArgs(&c, []string{
+		"-myfloat32", "3.21",
+		"-myint32", "321",
+		"-myuint32", "32",
+	})
+	AssertNil(t, err)
+
+	if math.Abs(float64(c.MyFloat32-3.21)) > 0.0001 {
+		t.Errorf("MyFloat32 should be 3.21, got %f", c.MyFloat32)
+	}
+	AssertEqual(t, c.MyInt32, int32(321))
+	AssertEqual(t, c.MyUint32, uint32(32))
+}
+
+func TestFillArgsWithPointerStruct(t *testing.T) {
+	type nested struct {
+		Value string
+	}
+
+	c := struct {
+		Nested *nested
+	}{}
+
+	err := FillArgs(&c, []string{"-nested.value", "hello"})
+	AssertNil(t, err)
+
+	AssertNotNil(t, c.Nested)
+	AssertEqual(t, c.Nested.Value, "hello")
+}
+
+func TestFillArgsIgnoreUnknownFlags(t *testing.T) {
+	c := struct {
+		Name string
+	}{}
+
+	err := FillArgs(&c, []string{"-unknown", "x", "-name", "known"})
+	AssertNil(t, err)
+
+	AssertEqual(t, c.Name, "known")
+}
+
+func TestFillArgsMalformedKnownFlag(t *testing.T) {
+	c := struct {
+		Count int
+	}{}
+
+	err := FillArgs(&c, []string{"-count", "invalid"})
+	AssertNotNil(t, err)
+
+	if !strings.Contains(err.Error(), "invalid value") {
+		t.Fatalf("expected parse error, got: %v", err)
+	}
 }

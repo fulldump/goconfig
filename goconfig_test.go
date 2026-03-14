@@ -148,3 +148,34 @@ func TestReadWithError_ImplicitConfig(t *testing.T) {
 
 	AssertEqual(t, c.Value, "file")
 }
+
+func TestReadWithError_ConfigFlagOrder(t *testing.T) {
+	dir, err := os.MkdirTemp("", "goconfig-config-flag-order")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer os.RemoveAll(dir)
+
+	file := filepath.Join(dir, "config.json")
+	if err := os.WriteFile(file, []byte(`{"other":"file"}`), 0644); err != nil {
+		t.Fatal(err)
+	}
+
+	oldArgs := os.Args
+	os.Args = []string{"cmd", "-value", "arg", "-config", file}
+	defer func() { os.Args = oldArgs }()
+
+	os.Unsetenv("VALUE")
+	os.Unsetenv("OTHER")
+
+	c := struct {
+		Value string
+		Other string
+	}{}
+
+	err = readWithError(&c)
+	AssertNil(t, err)
+
+	AssertEqual(t, c.Value, "arg")
+	AssertEqual(t, c.Other, "file")
+}

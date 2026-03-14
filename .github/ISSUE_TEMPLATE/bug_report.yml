@@ -1,0 +1,45 @@
+name: Bug report
+description: Report a reproducible bug in goconfig
+title: "bug: "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report this issue.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened?
+      description: Describe the bug and expected behavior.
+    validations:
+      required: true
+
+  - type: textarea
+    id: repro
+    attributes:
+      label: Reproduction
+      description: Minimal reproducible example or steps.
+      placeholder: |
+        1. Define config struct...
+        2. Set env var...
+        3. Run app...
+    validations:
+      required: true
+
+  - type: input
+    id: goversion
+    attributes:
+      label: Go version
+      placeholder: go version go1.23.0 linux/amd64
+    validations:
+      required: true
+
+  - type: input
+    id: goconfigversion
+    attributes:
+      label: goconfig version
+      placeholder: vX.Y.Z or commit hash
+    validations:
+      required: true
