@@ -69,6 +69,64 @@ If you want legacy one-liner behaviour (exit on error):
 goconfig.Read(&cfg)
 ```
 
+## Copy/Paste Recipes
+
+### 1) API service
+
+```go
+type Config struct {
+	HTTPPort int           `usage:"HTTP port"`
+	Timeout  time.Duration `usage:"Request timeout"`
+	DB struct {
+		Host string `usage:"Database host"`
+		Port int    `usage:"Database port"`
+	}
+}
+
+cfg := Config{HTTPPort: 8080, Timeout: 3 * time.Second}
+if err := goconfig.Load(&cfg); err != nil {
+	log.Fatal(err)
+}
+```
+
+### 2) Worker service
+
+```go
+type Config struct {
+	Concurrency int           `usage:"Worker concurrency"`
+	PollEvery   time.Duration `usage:"Polling interval"`
+	Queues      []string      `usage:"Enabled queues"`
+}
+
+cfg := Config{Concurrency: 4, PollEvery: 2 * time.Second}
+if err := goconfig.Load(&cfg); err != nil {
+	log.Fatal(err)
+}
+```
+
+Environment example:
+
+```bash
+export QUEUES='["emails", "billing"]'
+export CONCURRENCY=8
+```
+
+### 3) CLI tool with deterministic args/env (tests)
+
+```go
+cfg := Config{}
+err := goconfig.Load(&cfg,
+	goconfig.WithArgs([]string{"-verbose", "-config", "./testdata/config.json"}),
+	goconfig.WithEnvLookup(func(k string) (string, bool) {
+		if k == "VERBOSE" {
+			return "true", true
+		}
+		return "", false
+	}),
+	goconfig.WithoutImplicitConfigFile(),
+)
+```
+
 ## Precedence
 
 Highest priority wins:
@@ -177,11 +235,16 @@ make coverage
 - Code of conduct: `CODE_OF_CONDUCT.md`
 - Security policy: `SECURITY.md`
 - Changelog: `CHANGELOG.md`
+- Release process: `RELEASING.md`
 - Issue and PR templates: `.github/ISSUE_TEMPLATE` and `.github/pull_request_template.md`
 
 ## Contributing
 
 Issues and pull requests are welcome.
+
+## Roadmap
+
+See `ROADMAP.md` for the proposed adoption roadmap and high-impact issues.
 
 ## License
 
