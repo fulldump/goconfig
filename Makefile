@@ -6,7 +6,7 @@ all: test
 
 test:
 	$(GOCMD) version
-	$(GOCMD) test ./...
+	$(GOCMD) test --cover ./...
 
 example:
 	$(GOCMD) run ./example -help
