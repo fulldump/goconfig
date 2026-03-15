@@ -1,4 +1,3 @@
 module github.com/fulldump/goconfig
 
-go 1.5
-
+go 1.20

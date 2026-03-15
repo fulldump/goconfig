@@ -3,22 +3,20 @@
 ![Logo](logo.png)
 
 <p align="center">
-<a href="https://app.travis-ci.com/github/fulldump/goconfig"><img src="https://app.travis-ci.com/fulldump/goconfig.svg?branch=master"></a>
-<a href="https://goreportcard.com/report/github.com/fulldump/goconfig"><img src="https://goreportcard.com/badge/github.com/fulldump/goconfig"></a>
-<a href="https://godoc.org/github.com/fulldump/goconfig"><img src="https://godoc.org/github.com/fulldump/goconfig?status.svg" alt="GoDoc"></a>
+  <a href="https://github.com/fulldump/goconfig/actions/workflows/ci.yml"><img src="https://github.com/fulldump/goconfig/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+  <a href="https://pkg.go.dev/github.com/fulldump/goconfig"><img src="https://pkg.go.dev/badge/github.com/fulldump/goconfig.svg" alt="Go Reference"></a>
+  <a href="https://goreportcard.com/report/github.com/fulldump/goconfig"><img src="https://goreportcard.com/badge/github.com/fulldump/goconfig" alt="Go Report Card"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="MIT License"></a>
 </p>
 
+`goconfig` is a lightweight Go library that fills structs from:
 
-`goconfig` is a lightweight library that populates your Go structs from command
-line flags, environment variables and JSON configuration files. It aims to make
-configuration straightforward while keeping your code idiomatic.
+1. JSON config file
+2. Environment variables
+3. Command-line flags
 
-## Features
-
-- Unified configuration from flags, environment variables and JSON files
-- Hierarchical keys using struct fields
-- Supports arrays, `time.Duration`, and most native flag types
-- Auto-generated `-help` with usage information
+It is designed for apps that want production-ready configuration with minimal
+boilerplate.
 
 ## Installation
 
@@ -28,134 +26,230 @@ go get github.com/fulldump/goconfig
 
 ## Quick Start
 
-Define your configuration struct with descriptive tags:
+```go
+package main
+
+import (
+	"log"
+	"time"
+
+	"github.com/fulldump/goconfig"
+)
+
+type DB struct {
+	Host string `usage:"Database host"`
+	Port int    `usage:"Database port"`
+}
+
+type Config struct {
+	ServiceName string        `usage:"Service name"`
+	Timeout     time.Duration `usage:"Request timeout"`
+	DB          DB
+}
+
+func main() {
+	cfg := Config{
+		ServiceName: "payments",
+		Timeout:     5 * time.Second,
+		DB: DB{
+			Host: "localhost",
+			Port: 5432,
+		},
+	}
+
+	if err := goconfig.Load(&cfg); err != nil {
+		log.Fatal(err)
+	}
+}
+```
+
+If you want legacy one-liner behaviour (exit on error):
 
 ```go
-type myconfig struct {
-        Name      string `usage:"The name of something"`
-        EnableLog bool   `usage:"Enable logging into logdb" json:"enable_log"`
-        MaxProcs  int    `usage:"Maximum number of procs"`
-        UsersDB   db
-        LogDB     db
-}
-
-type db struct {
-        Host string `usage:"Host where db is located"`
-        User string `usage:"Database user"`
-        Pass string `usage:"Database password"`
-}
+goconfig.Read(&cfg)
 ```
 
-Provide defaults and read the configuration:
+## Copy/Paste Recipes
+
+### 1) API service
 
 ```go
-c := &myconfig{
-        EnableLog: true,
-        UsersDB: db{
-                Host: "localhost",
-                User: "root",
-                Pass: "123456",
-        },
+type Config struct {
+	HTTPPort int           `usage:"HTTP port"`
+	Timeout  time.Duration `usage:"Request timeout"`
+	DB struct {
+		Host string `usage:"Database host"`
+		Port int    `usage:"Database port"`
+	}
 }
 
-goconfig.Read(c)
+cfg := Config{HTTPPort: 8080, Timeout: 3 * time.Second}
+if err := goconfig.Load(&cfg); err != nil {
+	log.Fatal(err)
+}
 ```
 
-Running your program with `-help` prints automatically generated help text:
+### 2) Worker service
 
-```
-Usage of example:
-  -enablelog
-        Enable logging into logdb [env ENABLELOG] (default true)
-  -logdb.host string
-        Host where db is located [env LOGDB_HOST] (default "localhost")
-  -logdb.pass string
-        Database password [env LOGDB_PASS] (default "123456")
-  -logdb.user string
-        Database user [env LOGDB_USER] (default "root")
-  -maxprocs int
-        Maximum number of procs [env MAXPROCS]
-  -name string
-        The name of something [env NAME]
-  -usersdb.host string
-        Host where db is located [env USERSDB_HOST]
-  -usersdb.pass string
-        Database password [env USERSDB_PASS]
-  -usersdb.user string
-        Database user [env USERSDB_USER]
+```go
+type Config struct {
+	Concurrency int           `usage:"Worker concurrency"`
+	PollEvery   time.Duration `usage:"Polling interval"`
+	Queues      []string      `usage:"Enabled queues"`
+}
+
+cfg := Config{Concurrency: 4, PollEvery: 2 * time.Second}
+if err := goconfig.Load(&cfg); err != nil {
+	log.Fatal(err)
+}
 ```
 
-## Supported Types
+Environment example:
 
-`goconfig` supports the basic types from the `flag` package plus arrays and
-nested structs:
+```bash
+export QUEUES='["emails", "billing"]'
+export CONCURRENCY=8
+```
 
-- bool
-- float64
-- int64
-- int
-- string
-- uint64
-- uint
-- struct (hierarchical keys)
-- array (any type)
+### 3) CLI tool with deterministic args/env (tests)
 
-The `time.Duration` type is fully supported and can be provided as a
-duration string (e.g. `"15s"`) or as nanoseconds.
+```go
+cfg := Config{}
+err := goconfig.Load(&cfg,
+	goconfig.WithArgs([]string{"-verbose", "-config", "./testdata/config.json"}),
+	goconfig.WithEnvLookup(func(k string) (string, bool) {
+		if k == "VERBOSE" {
+			return "true", true
+		}
+		return "", false
+	}),
+	goconfig.WithoutImplicitConfigFile(),
+)
+```
 
-## Built-in Flags
+## Precedence
 
-### `-help`
+Highest priority wins:
 
-Uses the standard `flag` behaviour to display help.
+1. Command-line flags
+2. Environment variables
+3. JSON config file
+4. Struct default values
 
-### `-config`
+If `-config` is not provided and `./config.json` exists in the current working
+directory, `goconfig` loads it automatically before env vars and flags.
 
-Read configuration from a JSON file. Given the previous configuration structure,
-a sample `config.json` looks like:
+## Naming Convention
+
+Given this struct:
+
+```go
+type Config struct {
+	App struct {
+		Port int
+	}
+}
+```
+
+- Flag name: `-app.port`
+- Environment variable: `APP_PORT`
+- JSON object:
 
 ```json
 {
-  "name": "Fulanito",
-  "usersdb": {
-    "host": "localhost",
-    "user": "admin",
-    "pass": "123"
+  "app": {
+    "port": 8080
   }
 }
 ```
 
-If the -config flag is not provided, Goconfig will look for a file named
-`config.json` in the current working directory and load it if present.
+## Built-in Flags
 
-Configuration precedence (highest to lowest):
-1. Command line arguments
-2. Environment variables
-3. JSON config file
-4. Default values
+- `-help`: displays generated help with usage and env names
+- `-config`: JSON file path to load before env and flags
+
+When `-config` is not set, `goconfig` auto-loads `config.json` if it exists.
+
+## Supported Types
+
+- bool
+- string
+- float32, float64
+- int, int32, int64
+- uint, uint32, uint64
+- slices (`[]T`, as JSON arrays for env/flags)
+- nested structs
+- pointers to structs
+- `time.Duration` (duration string like `"15s"` or nanoseconds)
+
+## Public API
+
+### `Load`
+
+`Load` returns errors instead of exiting. This is the recommended API for
+libraries and services.
+
+```go
+err := goconfig.Load(&cfg)
+```
+
+Optional behavior can be controlled with options:
+
+- `WithArgs([]string)`
+- `WithProgramName("myapp")`
+- `WithConfigFile("/etc/myapp/config.json")`
+- `WithConfigFlagName("settings")`
+- `WithImplicitConfigFile("myconfig.json")`
+- `WithoutImplicitConfigFile()`
+- `WithEnvLookup(func(string) (string, bool))`
+
+### `Read`
+
+`Read` keeps backward compatibility and exits process on error.
+
+```go
+goconfig.Read(&cfg)
+```
+
+## Why Teams Use goconfig
+
+- Minimal integration cost for existing Go projects
+- Predictable override order across local/dev/prod
+- Built-in generated help for operations teams
+- No external runtime dependencies
+
+## Development
+
+```bash
+go test ./...
+```
+
+For local workflows:
+
+```bash
+make test
+make coverage
+```
+
+## Open Source Health
+
+- CI: GitHub Actions (`.github/workflows/ci.yml`)
+- Contributing guide: `CONTRIBUTING.md`
+- Code of conduct: `CODE_OF_CONDUCT.md`
+- Security policy: `SECURITY.md`
+- Changelog: `CHANGELOG.md`
+- Release process: `RELEASING.md`
+- Launch/promotion plan: `PROMOTION_PLAN.md`
+- Issue and PR templates: `.github/ISSUE_TEMPLATE` and `.github/pull_request_template.md`
 
 ## Contributing
 
-Contributions are welcome! Feel free to fork the repository, submit pull
-requests, or [open an issue](https://github.com/fulldump/goconfig/issues) if you
-encounter problems or have suggestions.
+Issues and pull requests are welcome.
 
-### Testing
+## Roadmap
 
-Run the full test suite with:
-
-```bash
-make
-```
-
-### Example Project
-
-This repository includes a small example. Build it with:
-
-```bash
-make example
-```
+See `ROADMAP.md` for the proposed adoption roadmap and high-impact issues.
 
 ## License
 
-Goconfig is released under the [MIT License](LICENSE).
+MIT License. See `LICENSE`.

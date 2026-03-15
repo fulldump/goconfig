@@ -153,3 +153,21 @@ func TestFillEnvironmentsEmptyOverride(t *testing.T) {
 
 	AssertEqual(t, c.Value, "")
 }
+
+func TestFillEnvironmentsWithPointerStruct(t *testing.T) {
+	type nested struct {
+		Value string
+	}
+
+	c := struct {
+		Nested *nested
+	}{}
+
+	os.Setenv("NESTED_VALUE", "hello")
+
+	err := FillEnvironments(&c)
+	AssertNil(t, err)
+
+	AssertNotNil(t, c.Nested)
+	AssertEqual(t, c.Nested.Value, "hello")
+}

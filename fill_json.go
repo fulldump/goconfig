@@ -3,19 +3,29 @@ package goconfig
 import (
 	"encoding/json"
 	"errors"
-	"io/ioutil"
+	"os"
 	"reflect"
 	"strings"
 	"time"
 )
 
 func FillJson(c interface{}, filename string) error {
-
 	if "" == filename {
 		return nil
 	}
 
-	data, err := ioutil.ReadFile(filename)
+	if c == nil {
+		return errors.New("config target cannot be nil")
+	}
+
+	unmarshalerType := reflect.TypeOf((*json.Unmarshaler)(nil)).Elem()
+	if !reflect.TypeOf(c).Implements(unmarshalerType) {
+		if err := validateConfigTarget(c); err != nil {
+			return err
+		}
+	}
+
+	data, err := os.ReadFile(filename)
 	if nil != err {
 		return err
 	}
@@ -24,12 +34,22 @@ func FillJson(c interface{}, filename string) error {
 }
 
 func unmarshalJSON(data []byte, c interface{}) error {
-	if reflect.TypeOf(c).Implements(reflect.TypeOf(new(json.Unmarshaler)).Elem()) {
+	if c == nil {
+		return errors.New("config target cannot be nil")
+	}
+
+	unmarshalerType := reflect.TypeOf((*json.Unmarshaler)(nil)).Elem()
+
+	if reflect.TypeOf(c).Implements(unmarshalerType) {
 		if err := json.Unmarshal(data, c); err != nil {
 			return errors.New("Bad json file: " + err.Error())
 		}
 
 	} else {
+		if err := validateConfigTarget(c); err != nil {
+			return err
+		}
+
 		var values map[string]json.RawMessage
 		if err := json.Unmarshal(data, &values); err != nil {
 			return errors.New("Bad json file: " + err.Error())
@@ -45,11 +65,23 @@ func unmarshalJSON(data []byte, c interface{}) error {
 				if i := strings.Index(tag, ","); i != -1 {
 					tag = tag[:i]
 				}
+
+				if tag == "-" {
+					return
+				}
 			}
 
 			// If the field is an anonymous struct without tag,
 			// treat its fields as part of the current level
 			if i.Anonymous && tag == "" && (i.Kind == reflect.Struct || (i.Kind == reflect.Ptr && i.Value.Type().Elem().Kind() == reflect.Struct)) {
+				if i.Kind == reflect.Ptr {
+					if i.Value.IsNil() {
+						i.Value.Set(reflect.New(i.Value.Type().Elem()))
+					}
+					unmarshalJSON(data, i.Value.Interface())
+					return
+				}
+
 				unmarshalJSON(data, i.Ptr)
 				return
 			}
@@ -65,13 +97,17 @@ func unmarshalJSON(data []byte, c interface{}) error {
 				return
 			}
 
-			unmarshaler := reflect.TypeOf((*json.Unmarshaler)(nil)).Elem()
-
-			if reflect.PtrTo(i.Value.Type()).Implements(unmarshaler) {
+			if reflect.PtrTo(i.Value.Type()).Implements(unmarshalerType) {
 				json.Unmarshal(value, i.Ptr)
 
 			} else if i.Value.Kind() == reflect.Struct {
 				unmarshalJSON(value, i.Ptr)
+
+			} else if i.Value.Kind() == reflect.Ptr && i.Value.Type().Elem().Kind() == reflect.Struct {
+				if i.Value.IsNil() {
+					i.Value.Set(reflect.New(i.Value.Type().Elem()))
+				}
+				unmarshalJSON(value, i.Value.Interface())
 
 			} else if reflect.TypeOf(time.Duration(0)) == i.Value.Type() {
 				var d time.Duration
