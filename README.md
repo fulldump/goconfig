@@ -11,7 +11,7 @@
 
 `goconfig` is a lightweight Go library that fills structs from:
 
-1. JSON config file
+1. JSON config file(s)
 2. Environment variables
 3. Command-line flags
 
@@ -133,11 +133,32 @@ Highest priority wins:
 
 1. Command-line flags
 2. Environment variables
-3. JSON config file
+3. JSON config file(s)
 4. Struct default values
 
 If `-config` is not provided and `./config.json` exists in the current working
 directory, `goconfig` loads it automatically before env vars and flags.
+
+## Multiple Config Files
+
+`-config` accepts multiple JSON file paths separated by commas. Files are loaded
+from left to right over the same struct, so later files override values from
+previous files while omitted fields keep their existing values.
+
+```bash
+myapp -config ./config.base.json,./config.prod.json,./config.local.json
+```
+
+The same comma-separated format also works with `WithConfigFile`:
+
+```go
+err := goconfig.Load(&cfg,
+	goconfig.WithConfigFile("./config.base.json,./config.prod.json"),
+)
+```
+
+Environment variables and command-line flags are still applied after all JSON
+files, so they keep higher precedence.
 
 ## Naming Convention
 
@@ -166,7 +187,7 @@ type Config struct {
 ## Built-in Flags
 
 - `-help`: displays generated help with usage and env names
-- `-config`: JSON file path to load before env and flags
+- `-config`: JSON file path or comma-separated paths to load before env and flags
 
 When `-config` is not set, `goconfig` auto-loads `config.json` if it exists.
 
