@@ -25,12 +25,23 @@ func FillJson(c interface{}, filename string) error {
 		}
 	}
 
-	data, err := os.ReadFile(filename)
-	if nil != err {
-		return err
+	for _, filename := range strings.Split(filename, ",") {
+		filename = strings.TrimSpace(filename)
+		if filename == "" {
+			continue
+		}
+
+		data, err := os.ReadFile(filename)
+		if nil != err {
+			return err
+		}
+
+		if err := unmarshalJSON(data, c); err != nil {
+			return err
+		}
 	}
 
-	return unmarshalJSON(data, c)
+	return nil
 }
 
 func unmarshalJSON(data []byte, c interface{}) error {

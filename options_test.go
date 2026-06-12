@@ -40,6 +40,45 @@ func TestLoadWithOptionsPrecedence(t *testing.T) {
 	AssertEqual(t, c.Value, "arg")
 }
 
+func TestLoadMultipleConfigFiles(t *testing.T) {
+	dir, err := os.MkdirTemp("", "goconfig-multiple-config")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer os.RemoveAll(dir)
+
+	base := filepath.Join(dir, "base.json")
+	if err := os.WriteFile(base, []byte(`{"value":"base","keep":"base","nested":{"name":"base","port":8080}}`), 0644); err != nil {
+		t.Fatal(err)
+	}
+
+	override := filepath.Join(dir, "override.json")
+	if err := os.WriteFile(override, []byte(`{"value":"override","nested":{"port":9090}}`), 0644); err != nil {
+		t.Fatal(err)
+	}
+
+	c := struct {
+		Value  string
+		Keep   string
+		Nested struct {
+			Name string
+			Port int
+		}
+	}{}
+
+	err = Load(&c,
+		WithArgs([]string{"--config", base + "," + override}),
+		WithEnvLookup(func(string) (string, bool) { return "", false }),
+		WithoutImplicitConfigFile(),
+	)
+	AssertNil(t, err)
+
+	AssertEqual(t, c.Value, "override")
+	AssertEqual(t, c.Keep, "base")
+	AssertEqual(t, c.Nested.Name, "base")
+	AssertEqual(t, c.Nested.Port, 9090)
+}
+
 func TestLoadWithoutImplicitConfigFile(t *testing.T) {
 	dir, err := os.MkdirTemp("", "goconfig-no-implicit")
 	if err != nil {
